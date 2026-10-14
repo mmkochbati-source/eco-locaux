@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "eco-locaux",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+      "runtimeArgs": ["--prefix", "C:\\Users\\mmkoc\\Downloads\\stitch_feature_integration_module\\eco-locaux", "run", "dev"],
+      "port": 5173
+    }
+  ]
+}

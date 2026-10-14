@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Eco-Locaux - Préparation du rendez-vous</title>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              emerald: '#00d084',
+              emeraldDark: '#00b371',
+              emeraldLight: '#10b981',
+              emeraldSoft: 'rgba(0, 208, 132, 0.12)',
+              bgDark: '#0c1115',
+              surfaceSidebar: '#0f1418',
+              surfaceCard: '#151d23',
+              surfaceCardHover: '#1a242c',
+              borderSlate: '#212d37',
+              borderSlateSubtle: '#1b252e',
+              textMuted: '#8b9ba8',
+              textSubtle: '#5c6f7e'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scrollbars">
+    /* Subtle custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f1418;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #212d37;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #324453;
+    }
+  </style>
+</head>
+<body class="bg-brand-bgDark text-slate-100 min-h-screen font-sans flex antialiased selection:bg-brand-emerald selection:text-black">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-brand-surfaceSidebar border-r border-brand-borderSlate flex flex-col justify-between shrink-0 select-none" data-purpose="sidebar-navigation">
+<div>
+<!-- Brand Logo Header -->
+<div class="h-16 px-6 flex items-center gap-3 border-b border-brand-borderSlateSubtle">
+<div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-brand-emerald">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24">
+<path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm1 14.5h-2v-2h2v2zm0-4h-2V7h2v5.5z" opacity="0.3"></path>
+<path d="M12 3.19L5.5 5.63v5.46c0 4.25 2.77 8.21 6.5 9.35 3.73-1.14 6.5-5.1 6.5-9.35V5.63L12 3.19zM12 22C6.48 20.67 3 15.6 3 11.09V4.5L12 1l9 3.5v6.59C21 15.6 17.52 20.67 12 22z"></path>
+<circle class="fill-brand-emerald" cx="12" cy="12" r="3"></circle>
+</svg>
+</div>
+<span class="font-bold text-white text-base tracking-tight">Eco-Locaux</span>
+</div>
+<!-- Navigation links -->
+<nav class="p-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-brand-textMuted hover:text-slate-100 hover:bg-slate-800/40 transition-colors text-sm font-medium" href="#">
+<svg class="w-4 h-4 shrink-0 text-brand-textMuted" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<path d="M21 21l-4.35-4.35" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+          Recherche
+        </a>
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg text-brand-textMuted hover:text-slate-100 hover:bg-slate-800/40 transition-colors text-sm font-medium" href="#">
+<div class="flex items-center gap-3">
+<svg class="w-4 h-4 shrink-0 text-brand-textMuted" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Mes prospects</span>
+</div>
+<span class="text-xs font-medium text-slate-400">128</span>
+</a>
+<!-- Active Menu: Rendez-vous -->
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-emerald-500/10 text-brand-emerald border border-brand-emerald/20 transition-colors text-sm font-semibold" href="#">
+<div class="flex items-center gap-3">
+<svg class="w-4 h-4 shrink-0 text-brand-emerald" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+<line x1="16" x2="16" y1="2" y2="6"></line>
+<line x1="8" x2="8" y1="2" y2="6"></line>
+<line x1="3" x2="21" y1="10" y2="10"></line>
+</svg>
+<span>Rendez-vous</span>
+</div>
+<span class="px-2 py-0.5 text-xs rounded-full bg-brand-emerald text-brand-bgDark font-bold">3</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-brand-textMuted hover:text-slate-100 hover:bg-slate-800/40 transition-colors text-sm font-medium" href="#">
+<svg class="w-4 h-4 shrink-0 text-brand-textMuted" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+          Statistiques
+        </a>
+</nav>
+</div>
+<!-- Bottom User Profile Card -->
+<div class="p-3 border-t border-brand-borderSlateSubtle">
+<div class="flex items-center gap-3 px-2 py-2 rounded-lg bg-slate-900/60 border border-brand-borderSlate/60">
+<div class="w-8 h-8 rounded-full bg-emerald-950/80 text-brand-emerald border border-emerald-600/30 flex items-center justify-center font-bold text-xs shrink-0">
+          CM
+        </div>
+<div class="min-w-0 flex-1">
+<div class="text-xs font-semibold text-white truncate">Camille Moreau</div>
+<div class="text-[11px] text-brand-textMuted truncate">Secteur Lyon Nord</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Area -->
+<div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+<!-- Top Header / Search & Notifications -->
+<header class="h-16 px-8 border-b border-brand-borderSlate flex items-center justify-between gap-4 shrink-0">
+<div class="relative w-full max-w-xl">
+<span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-500">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<path d="M21 21l-4.35-4.35" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<input class="w-full bg-[#11171d] border border-brand-borderSlate text-xs text-slate-200 placeholder-slate-500 rounded-lg pl-9 pr-12 py-2 focus:outline-none focus:border-brand-emerald/50 focus:ring-1 focus:ring-brand-emerald/50" placeholder="Rechercher un commerce, une ville, une rue..." type="text"/>
+<span class="absolute inset-y-0 right-2.5 flex items-center pointer-events-none">
+<kbd class="border border-slate-700 bg-slate-800/80 text-[10px] text-slate-400 font-mono px-1.5 py-0.5 rounded">⌘K</kbd>
+</span>
+</div>
+<div class="flex items-center gap-3">
+<button aria-label="Notifications" class="relative p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent hover:border-brand-borderSlate transition">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-400 rounded-full"></span>
+</button>
+</div>
+</header>
+<!-- Main Content Body -->
+<main class="flex-1 p-8 space-y-6 max-w-7xl">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 text-xs text-brand-textMuted" data-purpose="breadcrumbs">
+<a class="inline-flex items-center gap-1.5 hover:text-slate-300" href="#">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Fiche prospect</span>
+</a>
+<span class="text-slate-600">/</span>
+<span class="text-slate-300 font-medium">Préparation du rendez-vous</span>
+</nav>
+<!-- BEGIN: Meeting Overview Card -->
+<section class="bg-brand-surfaceCard border border-brand-borderSlate rounded-xl p-6" data-purpose="meeting-header">
+<!-- Top row: Name & 3 summary pills -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6">
+<div>
+<div class="flex items-center gap-3">
+<h1 class="text-2xl font-bold text-white tracking-tight">Le Fournil d'Antoine</h1>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-brand-emerald border border-emerald-500/30">
+                RDV planifié
+              </span>
+</div>
+<p class="text-xs text-brand-textMuted mt-1">
+              Avec Antoine Lefèvre, gérant · Boulangerie · potentiel <span class="text-brand-emerald font-semibold">82</span>/100
+            </p>
+</div>
+<!-- Info Boxes (Date, Adresse, Trajet) -->
+<div class="flex flex-wrap items-center gap-3">
+<!-- Box: Date -->
+<div class="bg-[#12191f] border border-brand-borderSlateSubtle rounded-lg px-4 py-2.5 min-w-[170px]">
+<div class="flex items-center gap-1.5 text-[11px] text-slate-400 mb-0.5">
+<svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+<line x1="16" x2="16" y1="2" y2="6"></line>
+<line x1="8" x2="8" y1="2" y2="6"></line>
+</svg>
+<span>Date et heure</span>
+</div>
+<div class="text-xs font-semibold text-white">Ven. 16 oct. · 15h30</div>
+<div class="text-[11px] text-amber-400 font-medium">Dans 2 jours · 45 min</div>
+</div>
+<!-- Box: Adresse -->
+<div class="bg-[#12191f] border border-brand-borderSlateSubtle rounded-lg px-4 py-2.5 min-w-[160px]">
+<div class="flex items-center gap-1.5 text-[11px] text-slate-400 mb-0.5">
+<svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Adresse</span>
+</div>
+<div class="text-xs font-semibold text-white">14 rue d'Austerlitz</div>
+<div class="text-[11px] text-slate-400">69004 Lyon</div>
+</div>
+<!-- Box: Trajet -->
+<div class="bg-[#12191f] border border-brand-borderSlateSubtle rounded-lg px-4 py-2.5 min-w-[160px]">
+<div class="flex items-center gap-1.5 text-[11px] text-slate-400 mb-0.5">
+<svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Trajet</span>
+</div>
+<div class="text-xs font-semibold text-white">12 min</div>
+<div class="text-[11px] text-slate-400">en voiture · 18 min à vélo</div>
+</div>
+</div>
+</div>
+<!-- Bottom row: Progress & Actions -->
+<div class="pt-4 border-t border-brand-borderSlateSubtle flex flex-col sm:flex-row items-center justify-between gap-4">
+<!-- Progress -->
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<span class="text-xs font-medium text-slate-300 shrink-0"><span class="font-bold text-white">4/8</span> prêts</span>
+<div class="w-48 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+<div class="bg-brand-emerald h-1.5 rounded-full w-1/2"></div>
+</div>
+</div>
+<!-- Buttons -->
+<div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+<button class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-brand-borderSlate text-xs font-medium text-slate-200 hover:bg-slate-800/80 transition">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Exporter en PDF</span>
+</button>
+<button class="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-brand-emerald hover:bg-brand-emeraldDark text-brand-bgDark font-bold text-xs tracking-tight transition shadow-sm">
+<svg class="w-3.5 h-3.5 fill-current" viewbox="0 0 24 24">
+<path d="M5 3l14 9-14 9V3z"></path>
+</svg>
+<span>Démarrer le RDV</span>
+</button>
+</div>
+</div>
+</section>
+<!-- END: Meeting Overview Card -->
+<!-- BEGIN: Content Grid (Checklist & Points/Objections) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+<!-- Column 1: Checklist de préparation -->
+<section class="bg-brand-surfaceCard border border-brand-borderSlate rounded-xl p-6 space-y-6" data-purpose="checklist-section">
+<h2 class="text-sm font-bold text-white tracking-wide">Checklist de préparation</h2>
+<!-- Group 1: Objectifs du RDV -->
+<div class="space-y-3">
+<div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+<span>Objectifs du RDV</span>
+<span class="text-slate-500 font-semibold">1/2</span>
+</div>
+<div class="space-y-2">
+<!-- Item completed -->
+<label class="flex items-center gap-3 text-xs cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded bg-emerald-500 text-brand-bgDark border-0 focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-slate-500 line-through select-none">Valider le relevé de consommation des 12 derniers mois</span>
+</label>
+<!-- Item pending -->
+<label class="flex items-center gap-3 text-xs cursor-pointer group">
+<input class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-brand-emerald focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white select-none">Obtenir l'accord pour un audit gratuit des fours</span>
+</label>
+</div>
+</div>
+<!-- Group 2: Documents à apporter -->
+<div class="space-y-3 pt-2">
+<div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+<span>Documents à apporter</span>
+<span class="text-slate-500 font-semibold">2/3</span>
+</div>
+<div class="space-y-2.5">
+<label class="flex items-center gap-3 text-xs cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded bg-brand-emerald text-brand-bgDark border-0 focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-slate-200 select-none">Proposition tarifaire « Pro Boulangerie »</span>
+</label>
+<label class="flex items-center gap-3 text-xs cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded bg-brand-emerald text-brand-bgDark border-0 focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-slate-200 select-none">Étude de cas d'un artisan-boulanger du 4e</span>
+</label>
+<label class="flex items-center gap-3 text-xs cursor-pointer group">
+<input class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-brand-emerald focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white select-none">Mandat de changement de fournisseur pré-rempli</span>
+</label>
+</div>
+</div>
+<!-- Group 3: Questions à poser -->
+<div class="space-y-3 pt-2">
+<div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+<span>Questions à poser</span>
+<span class="text-slate-500 font-semibold">1/3</span>
+</div>
+<div class="space-y-2.5">
+<label class="flex items-center gap-3 text-xs cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded bg-brand-emerald text-brand-bgDark border-0 focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-slate-500 line-through select-none">Quelle est la date d'échéance exacte du contrat actuel ?</span>
+</label>
+<label class="flex items-center gap-3 text-xs cursor-pointer group">
+<input class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-brand-emerald focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white select-none">À quelles heures tournent les fours la nuit ?</span>
+</label>
+<label class="flex items-center gap-3 text-xs cursor-pointer group">
+<input class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-brand-emerald focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white select-none">Un nouvel équipement est-il prévu cette année ?</span>
+</label>
+</div>
+</div>
+</section>
+<!-- Column 2: Key Points & Objections -->
+<div class="space-y-6">
+<!-- Card: Points clés à aborder -->
+<section class="bg-brand-surfaceCard border border-brand-borderSlate rounded-xl p-6" data-purpose="key-points-section">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-sm font-bold text-white tracking-wide">Points clés à aborder</h2>
+<span class="text-[11px] text-brand-textMuted">Adaptés aux boulangeries</span>
+</div>
+<div class="space-y-3">
+<!-- Item 1 -->
+<div class="p-3.5 rounded-lg bg-[#11171d] border border-brand-borderSlateSubtle flex items-start gap-3.5">
+<span class="w-6 h-6 rounded-md bg-emerald-950/80 border border-emerald-500/30 text-brand-emerald font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                  1
+                </span>
+<div class="space-y-1">
+<h3 class="text-xs font-bold text-white">Les fours représentent 58 % de sa facture</h3>
+<p class="text-[11px] leading-relaxed text-brand-textMuted">
+                    Caler la cuisson de 3h à 7h sur les heures creuses : jusqu'à <strong class="text-white font-semibold">2 100 €/an</strong> d'économies sur ce seul poste.
+                  </p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-3.5 rounded-lg bg-[#11171d] border border-brand-borderSlateSubtle flex items-start gap-3.5">
+<span class="w-6 h-6 rounded-md bg-emerald-950/80 border border-emerald-500/30 text-brand-emerald font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                  2
+                </span>
+<div class="space-y-1">
+<h3 class="text-xs font-bold text-white">Un prix fixe sur 3 ans</h3>
+<p class="text-[11px] leading-relaxed text-brand-textMuted">
+                    Le prix de la farine bouge déjà : l'énergie devient un coût prévisible, plus besoin de revoir ses tarifs en cours d'année.
+                  </p>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="p-3.5 rounded-lg bg-[#11171d] border border-brand-borderSlateSubtle flex items-start gap-3.5">
+<span class="w-6 h-6 rounded-md bg-emerald-950/80 border border-emerald-500/30 text-brand-emerald font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                  3
+                </span>
+<div class="space-y-1">
+<h3 class="text-xs font-bold text-white">Une énergie produite dans la région</h3>
+<p class="text-[11px] leading-relaxed text-brand-textMuted">
+                    Un argument vitrine pour une clientèle de quartier attachée au local : macaron « Fournil alimenté en énergie locale » offert.
+                  </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Card: Objections probables -->
+<section class="bg-brand-surfaceCard border border-brand-borderSlate rounded-xl p-6" data-purpose="objections-section">
+<div class="flex items-center gap-2 mb-4 text-amber-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<h2 class="text-sm font-bold text-white tracking-wide">Objections probables</h2>
+</div>
+<div class="space-y-2.5">
+<!-- Accordion 1 (Expanded) -->
+<div class="rounded-lg bg-[#11171d] border border-brand-borderSlateSubtle overflow-hidden">
+<button class="w-full p-3.5 text-left flex items-center justify-between text-xs font-semibold text-white focus:outline-none">
+<span>« Je n'ai pas le temps de m'occuper d'un changement. »</span>
+<svg class="w-4 h-4 text-slate-400 transition transform rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<div class="px-3.5 pb-3.5">
+<div class="p-3 bg-emerald-950/20 border-l-2 border-brand-emerald rounded-r-md">
+<div class="text-[10px] font-bold text-brand-emerald uppercase tracking-wider mb-1">
+                      Réponse suggérée
+                    </div>
+<p class="text-[11px] leading-relaxed text-slate-300">
+                      On s'occupe de tout : 15 minutes pour signer, aucune coupure de courant, et nous gérons les démarches auprès de votre fournisseur actuel.
+                    </p>
+</div>
+</div>
+</div>
+<!-- Accordion 2 (Collapsed) -->
+<div class="rounded-lg bg-[#11171d] border border-brand-borderSlateSubtle">
+<button class="w-full p-3.5 text-left flex items-center justify-between text-xs font-medium text-slate-200 hover:text-white focus:outline-none">
+<span>« Mon contrat court encore jusqu'en mars. »</span>
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<!-- Accordion 3 (Collapsed) -->
+<div class="rounded-lg bg-[#11171d] border border-brand-borderSlateSubtle">
+<button class="w-full p-3.5 text-left flex items-center justify-between text-xs font-medium text-slate-200 hover:text-white focus:outline-none">
+<span>« L'énergie verte, c'est forcément plus cher. »</span>
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- END: Content Grid -->
+</main>
+</div>
+<!-- END: Main Area -->
+</body></html>
