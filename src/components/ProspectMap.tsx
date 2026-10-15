@@ -26,7 +26,7 @@ export function ProspectMap({ profil, prospects, selectedId, onSelect, distanceO
   const distance = selected ? distanceOf(selected) : null;
 
   return (
-    <div className="relative h-full min-h-[320px] overflow-hidden rounded-2xl border border-[#1e2a3a] bg-[#0c131a]">
+    <div className="relative isolate h-full min-h-[320px] overflow-hidden rounded-2xl border border-[#1e2a3a] bg-[#0c131a]">
       <MapContainer
         center={profil.centre}
         zoom={ZOOM}
@@ -46,7 +46,7 @@ export function ProspectMap({ profil, prospects, selectedId, onSelect, distanceO
           interactive={false}
           pathOptions={{ color: '#ffffff', weight: 2, fillColor: '#3b82f6', fillOpacity: 1 }}
         />
-        {prospects.map((p) => {
+        {prospects.filter(hasCoords).map((p) => {
           const isSelected = p.id === selectedId;
           return (
             <CircleMarker
@@ -97,7 +97,7 @@ export function ProspectMap({ profil, prospects, selectedId, onSelect, distanceO
 function PanToSelected({ target }: { target: Prospect | null }) {
   const map = useMap();
   useEffect(() => {
-    if (target) map.panTo({ lat: target.lat, lng: target.lng });
+    if (target && hasCoords(target)) map.panTo({ lat: target.lat, lng: target.lng });
   }, [map, target]);
   return null;
 }
@@ -145,4 +145,9 @@ function Legend({ rayonKm }: { rayonKm: number }) {
       </span>
     </div>
   );
+}
+
+/** Prospects sans coordonnées (adresse non géocodée) : absents de la carte, présents dans la liste. */
+function hasCoords(p: Prospect): p is Prospect & { lat: number; lng: number } {
+  return p.lat !== null && p.lng !== null;
 }

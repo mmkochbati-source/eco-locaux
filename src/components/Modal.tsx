@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { XIcon } from './icons';
 
 interface ModalProps {
@@ -25,7 +26,8 @@ export function Modal({ title, onClose, children, footer }: ModalProps) {
     };
   }, [onClose]);
 
-  return (
+  // Rendue dans <body> : au-dessus de tout (carte comprise), quel que soit le composant qui ouvre la fenêtre.
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
       onMouseDown={(e) => {
@@ -55,6 +57,7 @@ export function Modal({ title, onClose, children, footer }: ModalProps) {
         <div className="px-5 py-4">{children}</div>
         {footer && <div className="flex justify-end gap-2 border-t border-line px-5 py-3">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { BellIcon, PlusIcon, SearchIcon } from './icons';
+import { BellIcon, DownloadIcon, PlusIcon, SearchIcon } from './icons';
+import { ImportProspectsModal } from './ImportProspectsModal';
 import { NewProspectModal } from './NewProspectModal';
 
 export const SHORTCUT_LABEL = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K';
@@ -17,6 +18,7 @@ export function Topbar() {
   const onList = isListPage(pathname);
   const [draft, setDraft] = useState('');
   const [creating, setCreating] = useState(false);
+  const [importing, setImporting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const value = onList ? (params.get('q') ?? '') : draft;
@@ -83,6 +85,12 @@ export function Topbar() {
           <BellIcon className="h-5 w-5" />
         </button>
         {onList && (
+          <button type="button" onClick={() => setImporting(true)} className="btn-secondary px-3.5">
+            <DownloadIcon className="h-4 w-4" />
+            <span>Importer</span>
+          </button>
+        )}
+        {onList && (
           <button type="button" onClick={() => setCreating(true)} className="btn-primary px-3.5">
             <PlusIcon className="h-4 w-4" />
             <span>Nouveau prospect</span>
@@ -90,6 +98,7 @@ export function Topbar() {
         )}
       </div>
       {creating && <NewProspectModal onClose={() => setCreating(false)} />}
+      {importing && <ImportProspectsModal onClose={() => setImporting(false)} />}
     </header>
   );
 }

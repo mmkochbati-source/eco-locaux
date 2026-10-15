@@ -26,11 +26,11 @@ export default function PreparationRdv() {
   async function regenerate() {
     setConfirmRegen(false);
     setActionError(null);
+    setPrep((p) => ({ ...p!, statut: 'en_cours', erreur_detail: null }));
     try {
       await repository.regeneratePreparation(id);
-      setPrep((p) => ({ ...p!, statut: 'en_cours' }));
-    } catch {
-      setActionError('Impossible de relancer la génération.');
+    } catch (err) {
+      setPrep((p) => ({ ...p!, statut: 'erreur', erreur_detail: err instanceof Error ? err.message : null }));
     }
   }
 
@@ -184,6 +184,7 @@ export default function PreparationRdv() {
         <div role="alert" className="card flex flex-col items-center gap-3 rounded-2xl px-6 py-12 text-center">
           <WarningIcon className="h-7 w-7 text-amber-400" />
           <p className="text-base font-semibold text-white">La génération a échoué</p>
+          {prep.data?.erreur_detail && <p className="text-sm text-amber-300">{prep.data.erreur_detail}</p>}
           <p className="text-sm text-slate-400">Les informations du rendez-vous sont conservées. Vous pouvez relancer la préparation.</p>
           <button type="button" onClick={onRegenerateClick} className="btn-primary mt-2 px-5 py-2.5 text-sm">
             <RefreshIcon className="h-4 w-4" />

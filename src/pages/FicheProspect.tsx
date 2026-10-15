@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { PrioriteHauteBadge, StatutBadge } from '../components/Badge';
 import { HistoriqueCard } from '../components/fiche/HistoriqueCard';
@@ -28,6 +28,18 @@ export default function FicheProspect() {
   const [planning, setPlanning] = useState(false);
   const { setData } = prospect;
   const onTagsChanged = useCallback((tags: string[]) => setData((prev) => ({ ...prev!, tags })), [setData]);
+
+  // Realtime : tags ajoutés par l'IA, chiffres recalculés en base après une modification.
+  useEffect(
+    () =>
+      repository.subscribeProspects(() => {
+        repository
+          .getProspect(id)
+          .then((p) => setData(p))
+          .catch(() => {});
+      }),
+    [id, setData],
+  );
 
   // « ← Résultats » ramène à la liste d'origine (Recherche ou Mes prospects).
   const from = (location.state as { from?: string } | null)?.from ?? '/prospects';

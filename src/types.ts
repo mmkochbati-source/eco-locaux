@@ -13,8 +13,8 @@ export interface Prospect {
   nom: string;
   categorie: Categorie;
   adresse: string;
-  lat: number;
-  lng: number;
+  lat: number | null; // null tant que l'adresse n'est pas géocodée : masqué sur la carte, gardé dans la liste
+  lng: number | null;
   telephone: string | null;
   horaires: Record<string, string> | null; // ex. { "mar-sam": "6h30–19h30", "dim": "7h–13h" }
   gerant: string | null;
@@ -51,6 +51,7 @@ export interface Note {
   prospect_id: string;
   texte: string;
   statut_analyse: 'aucune' | 'en_cours' | 'terminee' | 'erreur';
+  analyse_ia?: unknown;
   created_at: string;
 }
 
@@ -77,10 +78,12 @@ export interface PreparationRdv {
   objections: { objection: string; reponse: string; source: 'reference' | 'ia' }[];
   genere_le: string | null;
   modifie_par_commercial: boolean;
+  erreur_detail?: string | null;
 }
 
 export interface Profil {
   nom: string;
+  secteur_id: string | null;
   initiales: string;
   secteur_nom: string;
   centre: { lat: number; lng: number };

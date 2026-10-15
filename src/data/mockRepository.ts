@@ -140,6 +140,8 @@ function findPreparation(rdvId: string): PreparationRdv {
 
 // --- Analyse de note : simulation du workflow WF2 ---
 
+const noteListeners = new Map<string, Set<(n: Note) => void>>();
+
 function scheduleAnalyse(noteId: string) {
   const fail = simulate('error');
   window.setTimeout(() => {
@@ -154,6 +156,7 @@ function scheduleAnalyse(noteId: string) {
       prospect.tags = Array.from(new Set([...prospect.tags, ...found]));
     }
     persist();
+    noteListeners.get(note.prospect_id)?.forEach((cb) => cb(structuredClone(note)));
   }, ANALYSE_DELAY_MS);
 }
 
@@ -323,4 +326,20 @@ export const mockRepository: Repository = {
 
   // Avec le mock, l'écran ouvre la boîte d'impression du navigateur.
   exportPreparationPdf: async () => delay({ pdf_url: null }),
+
+  // En démo, l'import Google Places n'ajoute rien : les 6 commerces de la maquette suffisent.
+  importProspects: async () => {
+    await delay(null);
+  },
+
+  // En démo, la liste se rafraîchit via l'événement DATA_CHANGED_EVENT.
+  subscribeProspects: () => () => {},
+
+  subscribeNote: (prospectId, cb) => {
+    if (!noteListeners.has(prospectId)) noteListeners.set(prospectId, new Set());
+    noteListeners.get(prospectId)!.add(cb);
+    return () => {
+      noteListeners.get(prospectId)?.delete(cb);
+    };
+  },
 };

@@ -3,7 +3,10 @@
 interface ImportMetaEnv {
   readonly VITE_DATA_SOURCE?: 'mock' | 'supabase';
   readonly VITE_SUPABASE_URL?: string;
-  readonly VITE_SUPABASE_ANON_KEY?: string;}
+  readonly VITE_SUPABASE_ANON_KEY?: string;
+  readonly VITE_N8N_BASE_URL?: string;
+  readonly VITE_N8N_WEBHOOK_PREFIX?: string;
+}
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;

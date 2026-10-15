@@ -18,5 +18,6 @@ export function useProfil(): Profil | null {
 /** Distance depuis le centre du secteur (position du commercial non utilisée pour la démo). */
 export function useDistance() {
   const profil = useProfil();
-  return (p: { lat: number; lng: number }) => (profil ? distanceMeters(profil.centre, p) : null);
+  return (p: { lat: number | null; lng: number | null }) =>
+    profil && p.lat !== null && p.lng !== null ? distanceMeters(profil.centre, { lat: p.lat, lng: p.lng }) : null;
 }

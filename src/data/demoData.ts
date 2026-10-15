@@ -4,6 +4,7 @@ import type { Categorie, Historique, Note, PreparationRdv, Profil, Prospect, Ren
 
 export const DEMO_PROFIL: Profil = {
   nom: 'Camille Moreau',
+  secteur_id: 'sec-lyon-nord',
   initiales: 'CM',
   secteur_nom: 'Lyon Nord',
   centre: { lat: 45.772, lng: 4.836 },

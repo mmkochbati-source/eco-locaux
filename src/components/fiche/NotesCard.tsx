@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
+import { N8nError } from '../../data/n8n';
 import { repository } from '../../data/repository';
 import { useAsync } from '../../lib/useAsync';
 import type { Note, Prospect } from '../../types';
 
 const RACCOURCIS = ["Préfère l'après-midi", 'Décideur présent'];
-const POLL_MS = 700;
 
 export function NotesCard({ prospect, onTagsChanged }: { prospect: Prospect; onTagsChanged: (tags: string[]) => void }) {
   const note = useAsync(() => repository.getNote(prospect.id), [prospect.id]);
@@ -22,22 +22,20 @@ export function NotesCard({ prospect, onTagsChanged }: { prospect: Prospect; onT
     }
   }, [note.data]);
 
-  // Analyse IA asynchrone : on suit l'état de la note, puis on relit les tags du prospect.
-  useEffect(() => {
-    if (analyse !== 'en_cours') return;
-    const timer = window.setInterval(async () => {
-      try {
-        const n = await repository.getNote(prospect.id);
-        if (n && n.statut_analyse !== 'en_cours') {
-          setAnalyse(n.statut_analyse);
-          if (n.statut_analyse === 'terminee') onTagsChanged((await repository.getProspect(prospect.id)).tags);
+  // Analyse IA asynchrone : Realtime signale le changement de statut, puis on relit les tags du prospect.
+  useEffect(
+    () =>
+      repository.subscribeNote(prospect.id, (n) => {
+        setAnalyse(n.statut_analyse);
+        if (n.statut_analyse === 'terminee') {
+          repository
+            .getProspect(prospect.id)
+            .then((p) => onTagsChanged(p.tags))
+            .catch(() => {});
         }
-      } catch {
-        // nouvel essai au prochain intervalle
-      }
-    }, POLL_MS);
-    return () => window.clearInterval(timer);
-  }, [analyse, prospect.id, onTagsChanged]);
+      }),
+    [prospect.id, onTagsChanged],
+  );
 
   async function onSave() {
     setSaving(true);
@@ -47,6 +45,11 @@ export function NotesCard({ prospect, onTagsChanged }: { prospect: Prospect; onT
       setSaved(n.texte);
       setAnalyse(n.statut_analyse);
     } catch (err) {
+      if (err instanceof N8nError) {
+        // La note est enregistrée ; seul le déclenchement de l'analyse a échoué.
+        setSaved(texte);
+        setAnalyse('erreur');
+      }
       setError(err instanceof Error ? err.message : 'Enregistrement impossible');
     } finally {
       setSaving(false);

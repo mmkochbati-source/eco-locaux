@@ -15,7 +15,7 @@ import {
 import { ProspectMap } from '../components/ProspectMap';
 import { EmptyState, ErrorState } from '../components/StateViews';
 import { SHORTCUT_LABEL } from '../components/Topbar';
-import { repository } from '../data/repository';
+import { DATA_CHANGED_EVENT, repository } from '../data/repository';
 import {
   CATEGORIE_LABEL,
   CATEGORIE_PLURIEL,
@@ -66,10 +66,26 @@ export default function Recherche({ mode }: { mode: Mode }) {
   const results = useMemo(() => {
     const items = (list.data ?? []).filter(keep);
     return [...items].sort((a, b) =>
-      tri === 'potentiel' ? b.score_potentiel - a.score_potentiel : (distanceOf(a) ?? 0) - (distanceOf(b) ?? 0),
+      tri === 'potentiel' ? b.score_potentiel - a.score_potentiel : (distanceOf(a) ?? 1e9) - (distanceOf(b) ?? 1e9),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list.data, tri, mode, profil]);
+
+  // Nouveaux prospects (import Google Places, création) : Realtime en Supabase, événement local en démo.
+  const { reload: reloadList } = list;
+  const { reload: reloadTotals } = totals;
+  useEffect(() => {
+    const refresh = () => {
+      reloadList();
+      reloadTotals();
+    };
+    window.addEventListener(DATA_CHANGED_EVENT, refresh);
+    const unsubscribe = repository.subscribeProspects(refresh);
+    return () => {
+      window.removeEventListener(DATA_CHANGED_EVENT, refresh);
+      unsubscribe();
+    };
+  }, [reloadList, reloadTotals]);
 
   // Changement de page Recherche ↔ Mes prospects : on repart de filtres vides.
   useEffect(() => {

@@ -34,6 +34,9 @@ export interface Repository {
     patch: Partial<Pick<PreparationRdv, 'checklist' | 'points_cles' | 'objections'>>,
   ): Promise<void>; // met modifie_par_commercial à true pour points_cles / objections
   exportPreparationPdf(rdvId: string): Promise<{ pdf_url: string | null }>; // WF4
+  importProspects(categories: Categorie[]): Promise<void>; // WF1 : les prospects arrivent ensuite par Realtime
+  subscribeProspects(cb: () => void): () => void; // Realtime sur la table prospects
+  subscribeNote(prospectId: string, cb: (n: Note) => void): () => void; // Realtime sur la table notes
 }
 
 // Événement émis après chaque écriture, pour que la sidebar (badges) se mette à jour.
@@ -47,6 +50,7 @@ const WRITE_METHODS = new Set<keyof Repository>([
   'createRendezVous',
   'regeneratePreparation',
   'updatePreparation',
+  'importProspects',
 ]);
 
 function withChangeEvents(repo: Repository): Repository {

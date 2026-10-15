@@ -4,11 +4,13 @@ import { DATA_CHANGED_EVENT, repository } from '../data/repository';
 import { isUpcoming } from '../lib/format';
 import { useProfil } from '../lib/ProfilContext';
 import { useAsync } from '../lib/useAsync';
-import { BuildingIcon, CalendarIcon, GlobeIcon, SearchIcon } from './icons';
+import { BuildingIcon, CalendarIcon, GlobeIcon, LogoutIcon, SearchIcon } from './icons';
+import { useAuth } from '../lib/AuthContext';
 
 export function Sidebar() {
   const { pathname } = useLocation();
   const profil = useProfil();
+  const auth = useAuth();
   const counts = useAsync(async () => {
     const [prospects, rdvs] = await Promise.all([repository.listProspects(), repository.listRendezVous()]);
     return {
@@ -21,7 +23,11 @@ export function Sidebar() {
   const { reload } = counts;
   useEffect(() => {
     window.addEventListener(DATA_CHANGED_EVENT, reload);
-    return () => window.removeEventListener(DATA_CHANGED_EVENT, reload);
+    const unsubscribe = repository.subscribeProspects(reload);
+    return () => {
+      window.removeEventListener(DATA_CHANGED_EVENT, reload);
+      unsubscribe();
+    };
   }, [reload]);
 
   const items = [
@@ -82,10 +88,21 @@ export function Sidebar() {
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1b3d36] text-xs font-bold text-brand ring-1 ring-brand/40">
             {profil?.initiales ?? '··'}
           </div>
-          <div className="flex min-w-0 flex-col">
+          <div className="flex min-w-0 flex-1 flex-col">
             <span className="truncate text-xs font-semibold text-white">{profil?.nom ?? ' '}</span>
             <span className="truncate text-[11px] text-slate-400">{profil ? `Secteur ${profil.secteur_nom}` : ' '}</span>
           </div>
+          {auth.enabled && (
+            <button
+              type="button"
+              onClick={() => void auth.signOut()}
+              aria-label="Se déconnecter"
+              title="Se déconnecter"
+              className="rounded-md p-1.5 text-slate-400 transition hover:bg-raised hover:text-white"
+            >
+              <LogoutIcon className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
     </aside>
