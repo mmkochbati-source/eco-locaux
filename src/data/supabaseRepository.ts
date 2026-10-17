@@ -157,7 +157,7 @@ export const supabaseRepository: Repository = {
 
   async listRendezVous() {
     return check(
-      await db().from('rendez_vous').select('id, prospect_id, date_heure, duree_min, statut, prospect:prospects(id, nom, categorie)').order('date_heure'),
+      await db().from('rendez_vous').select('id, prospect_id, date_heure, duree_min, statut, prospect:prospects(id, nom, categorie, famille)').order('date_heure'),
       'Rendez-vous',
     ) as unknown as RendezVousAvecProspect[];
   },

@@ -55,7 +55,12 @@ function seed(): State {
 function load(): State {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as State;
+    if (raw) {
+      const st = JSON.parse(raw) as State;
+      // Anciennes sauvegardes sans famille : la catégorie y était déjà une famille.
+      st.prospects = st.prospects.map((p) => ({ ...p, famille: p.famille ?? (p.categorie as Prospect['famille']) }));
+      return st;
+    }
   } catch {
     // stockage indisponible ou corrompu : on repart des données de démo
   }
@@ -175,7 +180,7 @@ function notifyEmail(e: EmailProspection) {
   emailListeners.get(e.prospect_id)?.forEach((cb) => cb(structuredClone(e)));
 }
 
-const POSTES: Record<Prospect['categorie'], string> = {
+const POSTES: Record<Prospect['famille'], string> = {
   boulangerie: 'les fours de cuisson et les chambres de froid',
   cafe: 'les machines à café et les frigos de bar',
   epicerie: 'les meubles frigorifiques ouverts et l\'éclairage',
@@ -188,7 +193,7 @@ function demoEmail(p: Prospect): Pick<EmailProspection, 'objet' | 'message'> {
   return {
     objet: `${p.nom} : alléger la facture d'énergie`,
     message:
-      `Bonjour,\n\nDans un commerce comme le vôtre, ${POSTES[p.categorie]} pèsent souvent lourd sur la facture d'électricité. ` +
+      `Bonjour,\n\nDans un commerce comme le vôtre, ${POSTES[p.famille]} pèsent souvent lourd sur la facture d'électricité. ` +
       `Chaque poste mal réglé grignote directement la marge.\n\nEco-Locaux propose un court diagnostic pour repérer où ${p.nom} consomme le plus ` +
       `et les premières actions pour alléger la facture.\n\nAuriez-vous 15 minutes cette semaine ou la suivante, sur place ou par téléphone ?\n\n` +
       `Si le sujet ne vous intéresse pas, répondez simplement « non merci » et je ne vous recontacterai pas.\n\n${DEMO_PROFIL.nom}\nEco-Locaux`,
@@ -221,6 +226,7 @@ export const mockRepository: Repository = {
       google_place_id: null,
       nom: input.nom,
       categorie: input.categorie,
+      famille: input.categorie,
       adresse: input.adresse,
       lat: DEMO_PROFIL.centre.lat,
       lng: DEMO_PROFIL.centre.lng,
@@ -304,7 +310,7 @@ export const mockRepository: Repository = {
       state.rendezVous
         .map((r) => {
           const p = findProspect(r.prospect_id);
-          return { ...r, prospect: { id: p.id, nom: p.nom, categorie: p.categorie } };
+          return { ...r, prospect: { id: p.id, nom: p.nom, categorie: p.categorie, famille: p.famille } };
         })
         .sort((a, b) => a.date_heure.localeCompare(b.date_heure)),
     ),

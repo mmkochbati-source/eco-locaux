@@ -48,7 +48,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 function ReadView({ prospect: p }: { prospect: Prospect }) {
   const horaires = p.horaires ? Object.entries(p.horaires) : [];
   const [first, ...rest] = horaires;
-  const labelProduction = p.categorie === 'boulangerie' ? 'fournil' : 'production';
+  const labelProduction = p.famille === 'boulangerie' ? 'fournil' : 'production';
 
   return (
     <dl className="grid grid-cols-2 gap-x-8 gap-y-7">

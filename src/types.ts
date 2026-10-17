@@ -12,7 +12,8 @@ export interface Prospect {
   secteur_id: string;
   google_place_id: string | null;
   nom: string;
-  categorie: Categorie;
+  categorie: string; // texte saisi à l'import (ex. « Fleuriste »)
+  famille: Categorie; // déduite en base (eco_famille) : ratios, score, icône
   activite: string | null; // activité saisie à l'import (ex. « fleuriste »), affichée de préférence à la famille
   localisation: string | null; // ville saisie à l'import (ex. « Marseille »)
   adresse: string;
@@ -98,13 +99,13 @@ export interface Profil {
 }
 
 export interface ProspectFilters {
-  categorie?: Categorie;
+  categorie?: string;
   statut?: StatutProspect;
   priorite?: Priorite;
   q?: string;
 }
 
-export type RendezVousAvecProspect = RendezVous & { prospect: Pick<Prospect, 'id' | 'nom' | 'categorie'> };
+export type RendezVousAvecProspect = RendezVous & { prospect: Pick<Prospect, 'id' | 'nom' | 'categorie' | 'famille'> };
 
 // Email de prospection : brouillon rédigé par l'IA (WF4), relu par le commercial, envoyé par WF5.
 export type StatutEmail = 'generation' | 'brouillon' | 'envoi' | 'envoye' | 'erreur';
@@ -136,7 +137,7 @@ export interface Pilotage {
   emails: { envoyes: number; brouillons: number };
   rdv: { a_venir: number; realises: number; annules: number };
   par_statut: { statut: StatutProspect; nb: number }[];
-  par_categorie: { categorie: Categorie; prospects: number; rdv: number; score_moyen: number; economies_eur: number }[];
+  par_categorie: { categorie: string; prospects: number; rdv: number; score_moyen: number; economies_eur: number }[];
   par_commercial: {
     nom: string;
     secteur: string | null;

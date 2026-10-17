@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { CategoryIcon, ChevronRightIcon } from '../components/icons';
 import { EmptyState, ErrorState } from '../components/StateViews';
 import { repository } from '../data/repository';
-import { CATEGORIE_LABEL, RDV_STATUT_LABEL, formatRdvDate, formatRelativeDays } from '../lib/format';
+import { RDV_STATUT_LABEL, categorieLabel, formatRdvDate, formatRelativeDays } from '../lib/format';
 import { useAsync } from '../lib/useAsync';
 import type { RendezVous as Rdv } from '../types';
 
@@ -42,11 +42,11 @@ export default function RendezVous() {
                 className="group flex items-center gap-4 px-5 py-4 transition hover:bg-[#151f2b] focus-visible:ring-inset"
               >
                 <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-brand/20 bg-brand-tint text-brand">
-                  <CategoryIcon categorie={r.prospect.categorie} />
+                  <CategoryIcon categorie={r.prospect.famille} />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold text-white group-hover:text-brand">{r.prospect.nom}</span>
-                  <span className="text-xs text-slate-400">{CATEGORIE_LABEL[r.prospect.categorie]}</span>
+                  <span className="text-xs text-slate-400">{categorieLabel(r.prospect.categorie)}</span>
                 </span>
                 <span className="text-right">
                   <span className="block text-sm font-medium text-slate-200">{formatRdvDate(r.date_heure)}</span>

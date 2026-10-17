@@ -1,6 +1,6 @@
 import { ErrorState } from '../components/StateViews';
 import { repository } from '../data/repository';
-import { CATEGORIE_LABEL, STATUT_LABEL, formatDateShort, formatNumber } from '../lib/format';
+import { STATUT_LABEL, categorieLabel, formatDateShort, formatNumber } from '../lib/format';
 import { useProfil } from '../lib/ProfilContext';
 import { useAsync } from '../lib/useAsync';
 import type { Pilotage as PilotageData } from '../types';
@@ -127,7 +127,7 @@ function Contenu({ d }: { d: PilotageData }) {
               <tbody className="divide-y divide-line">
                 {d.par_categorie.map((c) => (
                   <tr key={c.categorie}>
-                    <th scope="row" className="py-2.5 font-medium text-slate-200">{CATEGORIE_LABEL[c.categorie]}</th>
+                    <th scope="row" className="py-2.5 font-medium text-slate-200">{categorieLabel(c.categorie)}</th>
                     <td className="py-2.5 text-right text-slate-300">{c.prospects}</td>
                     <td className="py-2.5 text-right text-slate-300">{c.rdv}</td>
                     <td className="py-2.5 text-right text-slate-300">{c.score_moyen}</td>

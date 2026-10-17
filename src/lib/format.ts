@@ -125,7 +125,13 @@ export function isUpcoming(iso: string): boolean {
 }
 
 /** Libellé d'activité : celui saisi à l'import s'il existe, sinon la famille. */
-export function activiteLabel(p: { activite?: string | null; categorie: Categorie }): string {
-  const a = p.activite?.trim();
-  return a ? a.charAt(0).toUpperCase() + a.slice(1) : CATEGORIE_LABEL[p.categorie];
+export function activiteLabel(p: { activite?: string | null; categorie: string }): string {
+  return categorieLabel(p.activite?.trim() || p.categorie);
+}
+
+/** Catégorie libre (« fleuriste ») ou clé de famille (« cafe ») → libellé affichable. */
+export function categorieLabel(c: string): string {
+  if (c in CATEGORIE_LABEL) return CATEGORIE_LABEL[c as Categorie];
+  const t = c.trim();
+  return t ? t.charAt(0).toUpperCase() + t.slice(1) : CATEGORIE_LABEL.autre;
 }

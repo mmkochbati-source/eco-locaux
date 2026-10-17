@@ -82,7 +82,7 @@ export default function FicheProspect() {
       <section className="card flex flex-wrap items-center justify-between gap-6 rounded-2xl p-7">
         <div className="flex min-w-0 items-start gap-6">
           <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl border border-line bg-[#152029] text-brand">
-            <CategoryIcon categorie={p.categorie} className="h-9 w-9" />
+            <CategoryIcon categorie={p.famille} className="h-9 w-9" />
           </div>
           <div className="min-w-0 space-y-3">
             <div className="flex flex-wrap items-center gap-3">

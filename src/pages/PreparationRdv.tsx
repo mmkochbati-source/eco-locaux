@@ -195,7 +195,7 @@ export default function PreparationRdv() {
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <ChecklistCard checklist={prep.data.checklist} onChange={updateChecklist} />
           <div className="space-y-6">
-            <PointsClesCard points={prep.data.points_cles} publicCible={CATEGORIE_PUBLIC[p.categorie]} />
+            <PointsClesCard points={prep.data.points_cles} publicCible={CATEGORIE_PUBLIC[p.famille]} />
             <ObjectionsCard objections={prep.data.objections} />
           </div>
         </div>

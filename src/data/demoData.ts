@@ -22,7 +22,7 @@ const base = {
   tags: [] as string[],
 };
 
-export const DEMO_PROSPECTS: Prospect[] = [
+const DEMO_PROSPECTS_BRUTS: Omit<Prospect, 'famille'>[] = [
   {
     ...base,
     id: 'p-pharmacie-plateau',
@@ -193,6 +193,9 @@ export const DEMO_PROSPECTS: Prospect[] = [
   },
 ];
 
+// En démo, la catégorie est déjà une famille.
+export const DEMO_PROSPECTS: Prospect[] = DEMO_PROSPECTS_BRUTS.map((p) => ({ ...p, famille: p.categorie as Categorie }));
+
 export const DEMO_HISTORIQUE: Historique[] = [
   {
     id: 'h-fournil-4',
@@ -348,7 +351,7 @@ export function buildPreparationContent(prospect: Prospect): Contenu {
     };
   }
 
-  const pluriel = CATEGORIE_PLURIEL[prospect.categorie];
+  const pluriel = CATEGORIE_PLURIEL[prospect.famille];
   return {
     trajet: { voiture_min: 10, velo_min: 15 },
     checklist: {

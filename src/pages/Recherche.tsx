@@ -408,7 +408,7 @@ function ProspectCard({
             selected ? 'border-brand/40 bg-[#142e2a]' : 'border-brand/20 bg-brand-tint'
           }`}
         >
-          <CategoryIcon categorie={p.categorie} />
+          <CategoryIcon categorie={p.famille} />
         </div>
         <div className="min-w-0">
           <h3 className="text-sm">
