@@ -49,8 +49,7 @@ export default function Recherche({ mode }: { mode: Mode }) {
   const [tri, setTri] = useState<Tri>('potentiel');
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // « Mes prospects » : commerces déjà travaillés (statut différent de « nouveau »).
-  const keep = (p: Prospect) => mode === 'recherche' || p.statut !== 'nouveau';
+  // « Mes prospects » affiche tous les commerces attribués au commercial, y compris ceux juste importés.
 
   const list = useAsync(
     () => repository.listProspects({ categorie, statut, priorite, q: q || undefined }),
@@ -59,13 +58,13 @@ export default function Recherche({ mode }: { mode: Mode }) {
   const totals = useAsync(async () => {
     const [all, rdvs] = await Promise.all([repository.listProspects(), repository.listRendezVous()]);
     return {
-      prospects: all.filter(keep).length,
+      prospects: all.length,
       rdvSemaine: rdvs.filter((r) => r.statut === 'planifie' && isUpcoming(r.date_heure) && isThisWeek(r.date_heure)).length,
     };
   }, [mode]);
 
   const results = useMemo(() => {
-    const items = (list.data ?? []).filter(keep);
+    const items = list.data ?? [];
     return [...items].sort((a, b) =>
       tri === 'potentiel' ? b.score_potentiel - a.score_potentiel : (distanceOf(a) ?? 1e9) - (distanceOf(b) ?? 1e9),
     );
@@ -108,7 +107,7 @@ export default function Recherche({ mode }: { mode: Mode }) {
     setQuery('');
   }
 
-  const statutsDisponibles = mode === 'prospects' ? STATUTS.filter((s) => s !== 'nouveau') : STATUTS;
+  const statutsDisponibles = STATUTS;
 
   return (
     <div className="flex h-full min-h-0 flex-col p-6">

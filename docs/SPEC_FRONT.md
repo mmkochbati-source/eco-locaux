@@ -157,7 +157,7 @@ Aucune authentification dans cette étape : le mock expose un commercial fixe (C
 
 ## Décisions validées (14 oct. 2026)
 
-- **« Mes prospects » vs « Recherche »** : `/prospects` réutilise l'écran Recherche en excluant les commerces au statut « nouveau ». Le badge du menu suit la même règle.
+- **« Mes prospects » vs « Recherche »** : `/prospects` réutilise l'écran Recherche et affiche tous les commerces attribués au commercial, y compris ceux juste importés (statut « nouveau »). Le badge du menu compte ces mêmes commerces. Changé le 17/10 : après un import, l'écran restait vide et semblait en panne.
 - **Carte** : react-leaflet avec tuiles sombres CARTO (Google Maps essayé puis abandonné : clé refusée ; solution libre retenue).
 - **Contenu IA de la préparation** : seule la checklist est modifiable pour le MVP ; l'édition des points clés et objections est reportée.
 - **Champs non typés des maquettes** (catégorie détaillée, « A demandé un devis », date d'estimation, durée d'appel, communes) : non affichés, aucune colonne ajoutée.

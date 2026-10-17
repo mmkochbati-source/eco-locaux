@@ -14,8 +14,8 @@ export function Sidebar() {
   const counts = useAsync(async () => {
     const [prospects, rdvs] = await Promise.all([repository.listProspects(), repository.listRendezVous()]);
     return {
-      // Même règle que l'écran « Mes prospects » : commerces déjà travaillés.
-      prospects: prospects.filter((p) => p.statut !== 'nouveau').length,
+      // Même règle que l'écran « Mes prospects » : tous les commerces attribués.
+      prospects: prospects.length,
       rdvAVenir: rdvs.filter((r) => r.statut === 'planifie' && isUpcoming(r.date_heure)).length,
     };
   }, []);
