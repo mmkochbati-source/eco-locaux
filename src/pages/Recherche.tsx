@@ -7,6 +7,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   FlagIcon,
+  MailIcon,
   NavigationIcon,
   PinIcon,
   SearchIcon,
@@ -422,6 +423,17 @@ function ProspectCard({
               <span className="flex items-center gap-1 text-[11px] text-slate-400">
                 <NavigationIcon className="h-3 w-3 rotate-45" />
                 {formatDistance(distance)}
+              </span>
+            )}
+            {p.email ? (
+              <span className="flex min-w-0 items-center gap-1 text-[11px] text-slate-300" title={p.email}>
+                <MailIcon className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{p.email}</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-[11px] text-slate-500">
+                <MailIcon className="h-3 w-3" />
+                Pas d'email
               </span>
             )}
           </div>

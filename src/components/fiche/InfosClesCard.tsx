@@ -55,10 +55,12 @@ function ReadView({ prospect: p }: { prospect: Prospect }) {
       <Field label="Gérant">{p.gerant}</Field>
       <Field label="Téléphone">{p.telephone}</Field>
       <Field label="E-mail">
-        {p.email && (
+        {p.email ? (
           <a href={`mailto:${p.email}`} className="text-sm transition hover:text-brand">
             {p.email}
           </a>
+        ) : (
+          <span className="text-sm text-slate-500">Pas d'email</span>
         )}
       </Field>
       <Field label="Horaires">
