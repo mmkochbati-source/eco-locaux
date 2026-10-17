@@ -47,6 +47,8 @@ export default function Recherche({ mode }: { mode: Mode }) {
   const [categorie, setCategorie] = useState<Categorie | undefined>();
   const [statut, setStatut] = useState<StatutProspect | undefined>();
   const [priorite, setPriorite] = useState<Priorite | undefined>();
+  // Ville choisie à l'import (prospects.localisation) ; SECTEUR = commerces importés sans ville (secteur du commercial).
+  const [ville, setVille] = useState<string>('');
   const [tri, setTri] = useState<Tri>('potentiel');
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -58,19 +60,28 @@ export default function Recherche({ mode }: { mode: Mode }) {
   );
   const totals = useAsync(async () => {
     const [all, rdvs] = await Promise.all([repository.listProspects(), repository.listRendezVous()]);
+    const villes = Array.from(new Set(all.map((p) => p.localisation?.trim()).filter((v): v is string => !!v))).sort((a, b) =>
+      a.localeCompare(b, 'fr'),
+    );
     return {
       prospects: all.length,
+      villes,
+      avecSecteur: all.some((p) => !p.localisation?.trim()),
       rdvSemaine: rdvs.filter((r) => r.statut === 'planifie' && isUpcoming(r.date_heure) && isThisWeek(r.date_heure)).length,
     };
   }, [mode]);
 
   const results = useMemo(() => {
-    const items = list.data ?? [];
+    const items = (list.data ?? []).filter((p) => {
+      if (!ville) return true;
+      const loc = p.localisation?.trim() ?? '';
+      return ville === SECTEUR ? loc === '' : loc.toLowerCase() === ville.toLowerCase();
+    });
     return [...items].sort((a, b) =>
       tri === 'potentiel' ? b.score_potentiel - a.score_potentiel : (distanceOf(a) ?? 1e9) - (distanceOf(b) ?? 1e9),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list.data, tri, mode, profil]);
+  }, [list.data, tri, mode, profil, ville]);
 
   // Nouveaux prospects (import Google Places, création) : Realtime en Supabase, événement local en démo.
   const { reload: reloadList } = list;
@@ -105,6 +116,7 @@ export default function Recherche({ mode }: { mode: Mode }) {
     setCategorie(undefined);
     setStatut(undefined);
     setPriorite(undefined);
+    setVille('');
     setQuery('');
   }
 
@@ -122,11 +134,11 @@ export default function Recherche({ mode }: { mode: Mode }) {
             {totals.data && profil ? (
               mode === 'recherche' ? (
                 <>
-                  {totals.data.prospects} commerces dans votre secteur · {profil.secteur_nom}
+                  {ville ? results.length : totals.data.prospects} commerces · {villeLabel(ville, profil.secteur_nom)}
                 </>
               ) : (
                 <>
-                  {totals.data.prospects} commerces suivis · {profil.secteur_nom}
+                  {ville ? results.length : totals.data.prospects} commerces suivis · {villeLabel(ville, profil.secteur_nom)}
                 </>
               )
             ) : (
@@ -180,11 +192,18 @@ export default function Recherche({ mode }: { mode: Mode }) {
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {profil && (
-              <span className="flex items-center gap-1.5 rounded-lg border border-line bg-card px-3 py-1.5 text-slate-300">
-                <PinIcon className="h-3.5 w-3.5 text-slate-400" />
-                <span>{profil.secteur_nom}</span>
-              </span>
+            {profil && totals.data && (totals.data.villes.length > 0 || totals.data.avecSecteur) && (
+              <SelectPill
+                label="Ville"
+                icon={<PinIcon className="h-3.5 w-3.5 text-slate-400" />}
+                value={ville}
+                onChange={setVille}
+                options={[
+                  { value: '', label: 'Toutes les villes' },
+                  ...totals.data.villes.map((v) => ({ value: v, label: v })),
+                  ...(totals.data.avecSecteur ? [{ value: SECTEUR, label: profil.secteur_nom }] : []),
+                ]}
+              />
             )}
             <SelectPill
               label="Statut"
@@ -288,6 +307,13 @@ function CategoryPill({ active, onClick, children }: { active: boolean; onClick:
       {children}
     </button>
   );
+}
+
+const SECTEUR = '__secteur__';
+
+function villeLabel(ville: string, secteurNom: string): string {
+  if (!ville) return 'toutes les villes';
+  return ville === SECTEUR ? secteurNom : ville;
 }
 
 function SelectPill({
