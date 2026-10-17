@@ -1,15 +1,18 @@
 import type { ReactNode } from 'react';
 import { formatNumber } from '../../lib/format';
-import type { NiveauInteret, Prospect } from '../../types';
+import type { Prospect } from '../../types';
 import { BoltIcon, EuroIcon, TargetIcon } from '../icons';
 
 // Tous les chiffres viennent des champs du prospect (calculés côté back-end) ; ici, affichage seulement.
 
-const INTERET: Record<NiveauInteret, { segments: number; label: string }> = {
-  faible: { segments: 2, label: 'Faible' },
-  moyen: { segments: 3, label: 'Moyen' },
-  eleve: { segments: 4, label: 'Élevé' },
-};
+// Score de potentiel (0–100) calculé en base par calculer_potentiel() : consommation estimée (50 pts),
+// échéance du contrat (30 pts), proximité du secteur (20 pts). Un segment = 20 points.
+function scoreLabel(score: number): string {
+  if (score >= 80) return 'Très bon';
+  if (score >= 65) return 'Bon';
+  if (score >= 40) return 'Moyen';
+  return 'Faible';
+}
 
 const REPARTITION = [
   { key: 'fours', label: 'Fours', color: 'bg-brand' },
@@ -37,7 +40,7 @@ function signed(n: number) {
 }
 
 export function PotentielCard({ prospect: p }: { prospect: Prospect }) {
-  const interet = p.niveau_interet ? INTERET[p.niveau_interet] : null;
+  const segments = Math.round(p.score_potentiel / 20);
   const repartition = REPARTITION.filter((r) => (p.repartition_conso?.[r.key] ?? 0) > 0);
 
   return (
@@ -72,13 +75,19 @@ export function PotentielCard({ prospect: p }: { prospect: Prospect }) {
             <Dash />
           )}
         </Tile>
-        <Tile icon={<TargetIcon className="h-4 w-4 text-red-400" />} title="Niveau d'intérêt">
-          <div className="flex gap-1" aria-hidden="true">
+        <Tile icon={<TargetIcon className="h-4 w-4 text-red-400" />} title="Score">
+          <p className="text-2xl font-bold text-white">
+            {p.score_potentiel} <span className="text-sm font-normal text-slate-400">/100</span>
+          </p>
+          <div className="mt-2 flex gap-1" aria-hidden="true">
             {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className={`h-1.5 flex-1 rounded-full ${interet && i < interet.segments ? 'bg-brand' : 'bg-[#243244]'}`} />
+              <span key={i} className={`h-1.5 flex-1 rounded-full ${i < segments ? 'bg-brand' : 'bg-[#243244]'}`} />
             ))}
           </div>
-          <p className={`mt-2 font-semibold ${interet ? 'text-white' : 'text-slate-500'}`}>{interet?.label ?? 'Non évalué'}</p>
+          <p className="mt-1.5 text-sm text-slate-400">
+            {scoreLabel(p.score_potentiel)}
+            {p.percentile_secteur !== null && ` · top ${p.percentile_secteur} %`}
+          </p>
         </Tile>
       </div>
 
