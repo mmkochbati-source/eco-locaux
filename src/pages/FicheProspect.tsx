@@ -11,7 +11,7 @@ import { PlanifierRdvModal } from '../components/PlanifierRdvModal';
 import { ScoreRing } from '../components/ScoreRing';
 import { ErrorState } from '../components/StateViews';
 import { repository } from '../data/repository';
-import { CATEGORIE_LABEL, formatDistance } from '../lib/format';
+import { activiteLabel, formatDistance } from '../lib/format';
 import { useDistance } from '../lib/ProfilContext';
 import { useAsync } from '../lib/useAsync';
 
@@ -91,7 +91,7 @@ export default function FicheProspect() {
             </div>
             {p.priorite === 'haute' && <PrioriteHauteBadge size="md" />}
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-400">
-              <span>{CATEGORIE_LABEL[p.categorie]}</span>
+              <span>{activiteLabel(p)}</span>
               <span className="text-slate-600">•</span>
               <span className="flex items-center gap-1">
                 <PinIcon className="h-4 w-4" />

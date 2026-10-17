@@ -2,7 +2,7 @@ import 'leaflet/dist/leaflet.css';
 import { useEffect } from 'react';
 import { Circle, CircleMarker, MapContainer, TileLayer, useMap } from 'react-leaflet';
 import { Link, useLocation } from 'react-router-dom';
-import { CATEGORIE_LABEL, formatDistance } from '../lib/format';
+import { activiteLabel, distanceMeters, formatDistance } from '../lib/format';
 import type { Profil, Prospect } from '../types';
 import { LocateIcon } from './icons';
 
@@ -65,6 +65,7 @@ export function ProspectMap({ profil, prospects, selectedId, onSelect, distanceO
           );
         })}
         <Controls center={profil.centre} />
+        <FitToFarProspects center={profil.centre} rayonKm={profil.rayon_km} prospects={prospects} />
         <PanToSelected target={selected} />
       </MapContainer>
 
@@ -74,7 +75,7 @@ export function ProspectMap({ profil, prospects, selectedId, onSelect, distanceO
             <div className="min-w-0">
               <h4 className="text-xs font-bold leading-snug text-white">{selected.nom}</h4>
               <p className="mt-1 text-[11px] text-slate-400">
-                {CATEGORIE_LABEL[selected.categorie]}
+                {activiteLabel(selected)}
                 {distance !== null && ` · ${formatDistance(distance)}`}
               </p>
             </div>
@@ -92,6 +93,23 @@ export function ProspectMap({ profil, prospects, selectedId, onSelect, distanceO
       <Legend rayonKm={profil.rayon_km} />
     </div>
   );
+}
+
+/**
+ * Import dans une autre ville (ex. Marseille) : si des commerces sont hors du secteur, la carte se cadre
+ * sur l'ensemble des commerces affichés au lieu de rester centrée sur le secteur.
+ */
+function FitToFarProspects({ center, rayonKm, prospects }: { center: Profil['centre']; rayonKm: number; prospects: Prospect[] }) {
+  const map = useMap();
+  const points = prospects.filter(hasCoords);
+  const key = points.map((p) => p.id).join(',');
+  useEffect(() => {
+    if (points.length === 0) return;
+    const loin = points.some((p) => distanceMeters(center, { lat: p.lat, lng: p.lng }) > rayonKm * 2000);
+    if (loin) map.fitBounds(points.map((p) => [p.lat, p.lng] as [number, number]), { padding: [30, 30], maxZoom: ZOOM });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, key]);
+  return null;
 }
 
 function PanToSelected({ target }: { target: Prospect | null }) {

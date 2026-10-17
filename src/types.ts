@@ -1,6 +1,7 @@
 // Types alignés sur les colonnes Supabase (snake_case, en français) — voir docs/SPEC_FRONT.md.
 
-export type Categorie = 'boulangerie' | 'cafe' | 'epicerie' | 'coiffure' | 'pharmacie';
+// « autre » : activité saisie librement à l'import qui n'appartient à aucune des 5 familles (score sans ratio dédié).
+export type Categorie = 'boulangerie' | 'cafe' | 'epicerie' | 'coiffure' | 'pharmacie' | 'autre';
 export type StatutProspect = 'nouveau' | 'contacte' | 'rdv_planifie' | 'client' | 'perdu';
 export type Priorite = 'haute' | 'normale' | 'basse';
 export type NiveauInteret = 'faible' | 'moyen' | 'eleve';
@@ -12,6 +13,8 @@ export interface Prospect {
   google_place_id: string | null;
   nom: string;
   categorie: Categorie;
+  activite: string | null; // activité saisie à l'import (ex. « fleuriste »), affichée de préférence à la famille
+  localisation: string | null; // ville saisie à l'import (ex. « Marseille »)
   adresse: string;
   lat: number | null; // null tant que l'adresse n'est pas géocodée : masqué sur la carte, gardé dans la liste
   lng: number | null;

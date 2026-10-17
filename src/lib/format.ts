@@ -8,6 +8,7 @@ export const CATEGORIE_LABEL: Record<Categorie, string> = {
   epicerie: 'Épicerie',
   coiffure: 'Coiffure',
   pharmacie: 'Pharmacie',
+  autre: 'Autre',
 };
 
 export const CATEGORIE_PLURIEL: Record<Categorie, string> = {
@@ -16,6 +17,7 @@ export const CATEGORIE_PLURIEL: Record<Categorie, string> = {
   epicerie: 'Épiceries',
   coiffure: 'Coiffure',
   pharmacie: 'Pharmacies',
+  autre: 'Autres',
 };
 
 /** « Adaptés aux boulangeries » */
@@ -25,6 +27,7 @@ export const CATEGORIE_PUBLIC: Record<Categorie, string> = {
   epicerie: 'épiceries',
   coiffure: 'salons de coiffure',
   pharmacie: 'pharmacies',
+  autre: 'commerces',
 };
 
 export const RDV_STATUT_LABEL = {
@@ -119,4 +122,10 @@ export function isThisWeek(iso: string): boolean {
 
 export function isUpcoming(iso: string): boolean {
   return new Date(iso).getTime() >= Date.now();
+}
+
+/** Libellé d'activité : celui saisi à l'import s'il existe, sinon la famille. */
+export function activiteLabel(p: { activite?: string | null; categorie: Categorie }): string {
+  const a = p.activite?.trim();
+  return a ? a.charAt(0).toUpperCase() + a.slice(1) : CATEGORIE_LABEL[p.categorie];
 }

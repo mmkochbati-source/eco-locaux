@@ -1,33 +1,34 @@
 import { useState } from 'react';
 import { DATA_CHANGED_EVENT, repository } from '../data/repository';
-import { CATEGORIE_PLURIEL } from '../lib/format';
-import { useProfil } from '../lib/ProfilContext';
-import type { Categorie } from '../types';
 import { Modal } from './Modal';
 
-const CATEGORIES = Object.keys(CATEGORIE_PLURIEL) as Categorie[];
+const EXEMPLES_VILLES = ['Paris', 'Marseille', 'Toulouse', 'Montpellier'];
+const EXEMPLES_ACTIVITES = ['Boulangerie', 'Fleuriste', 'Restaurant', 'Pressing'];
 
-/** Import des commerces du secteur depuis Google Places (workflow n8n) : la liste se remplit ensuite en temps réel. */
+/**
+ * Import de commerces depuis Google Maps (workflow n8n WF1) : le commercial saisit librement
+ * une ville et une activité. La liste se remplit ensuite en temps réel.
+ */
 export function ImportProspectsModal({ onClose }: { onClose: () => void }) {
-  const profil = useProfil();
-  const [selected, setSelected] = useState<Categorie[]>([]);
+  const [localisation, setLocalisation] = useState('');
+  const [activite, setActivite] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [error, setError] = useState<string | null>(null);
 
-  function toggle(c: Categorie) {
-    setSelected((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]));
-  }
+  const valide = localisation.trim().length >= 2 && activite.trim().length >= 2;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!valide) return;
     setState('sending');
     setError(null);
     try {
-      await repository.importProspects(selected);
+      await repository.importProspects({ activite: activite.trim(), localisation: localisation.trim() });
       setState('sent');
       // Filet de sécurité : Realtime peut perdre des événements lors d'une rafale d'insertions
-      // (limite de messages par seconde). On rafraîchit donc aussi la liste pendant ~30 s.
-      for (const ms of [4000, 10000, 20000, 30000]) {
+      // (limite de messages par seconde). On rafraîchit donc aussi la liste pendant ~1 min,
+      // le temps que WF1 visite le site de chaque commerce pour trouver son email.
+      for (const ms of [5000, 15000, 30000, 45000, 60000]) {
         window.setTimeout(() => window.dispatchEvent(new Event(DATA_CHANGED_EVENT)), ms);
       }
     } catch (err) {
@@ -50,7 +51,7 @@ export function ImportProspectsModal({ onClose }: { onClose: () => void }) {
             <button type="button" onClick={onClose} className="btn-secondary">
               Annuler
             </button>
-            <button type="submit" form="form-import" disabled={state === 'sending' || selected.length === 0} className="btn-primary">
+            <button type="submit" form="form-import" disabled={state === 'sending' || !valide} className="btn-primary">
               {state === 'sending' ? 'Envoi…' : 'Importer'}
             </button>
           </>
@@ -59,22 +60,60 @@ export function ImportProspectsModal({ onClose }: { onClose: () => void }) {
     >
       {state === 'sent' ? (
         <p className="text-sm text-slate-300" role="status">
-          Import lancé. Les commerces apparaîtront dans la liste au fur et à mesure.
+          Import lancé : {activite.trim()} à {localisation.trim()}. Les commerces apparaîtront dans la liste au fur et à mesure (jusqu'à
+          une minute, le temps de chercher leurs emails).
         </p>
       ) : (
         <form id="form-import" onSubmit={onSubmit} className="space-y-4">
           <p className="text-xs text-slate-400">
-            Commerces du secteur {profil?.secteur_nom ?? ''} trouvés sur Google Maps, pour les catégories choisies.
+            Commerces trouvés sur Google Maps pour la ville et l'activité saisies (20 au maximum par import).
           </p>
-          <fieldset className="grid grid-cols-2 gap-2">
-            <legend className="label">Catégories</legend>
-            {CATEGORIES.map((c) => (
-              <label key={c} className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-[#0c131c] px-3 py-2 text-sm text-slate-200">
-                <input type="checkbox" checked={selected.includes(c)} onChange={() => toggle(c)} className="accent-[#00d284]" />
-                {CATEGORIE_PLURIEL[c]}
-              </label>
-            ))}
-          </fieldset>
+
+          <div>
+            <label htmlFor="import-localisation" className="label">
+              Localisation
+            </label>
+            <input
+              id="import-localisation"
+              type="text"
+              required
+              autoFocus
+              value={localisation}
+              onChange={(e) => setLocalisation(e.target.value)}
+              placeholder="Ex. : Paris, Marseille, Toulouse, Montpellier…"
+              list="import-villes"
+              autoComplete="off"
+              className="field w-full"
+            />
+            <datalist id="import-villes">
+              {EXEMPLES_VILLES.map((v) => (
+                <option key={v} value={v} />
+              ))}
+            </datalist>
+          </div>
+
+          <div>
+            <label htmlFor="import-activite" className="label">
+              Activité
+            </label>
+            <input
+              id="import-activite"
+              type="text"
+              required
+              value={activite}
+              onChange={(e) => setActivite(e.target.value)}
+              placeholder="Ex. : boulangerie, fleuriste, restaurant…"
+              list="import-activites"
+              autoComplete="off"
+              className="field w-full"
+            />
+            <datalist id="import-activites">
+              {EXEMPLES_ACTIVITES.map((a) => (
+                <option key={a} value={a} />
+              ))}
+            </datalist>
+          </div>
+
           {error && (
             <p role="alert" className="text-xs text-red-400">
               {error}

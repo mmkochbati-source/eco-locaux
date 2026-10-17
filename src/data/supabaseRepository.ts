@@ -228,10 +228,10 @@ export const supabaseRepository: Repository = {
     return { pdf_url: null };
   },
 
-  async importProspects(categories) {
+  async importProspects({ activite, localisation }) {
     const profil = await supabaseRepository.getProfil();
     if (!profil.secteur_id) throw new N8nError("Votre compte n'est rattaché à aucun secteur.", null);
-    await n8n.importerProspects(profil.secteur_id, categories);
+    await n8n.importerProspects(profil.secteur_id, activite, localisation);
   },
 
   subscribeProspects(cb) {

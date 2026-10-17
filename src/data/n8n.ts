@@ -1,4 +1,3 @@
-import type { Categorie } from '../types';
 import { getSupabase } from './supabaseClient';
 
 // Appels aux webhooks n8n. Le front n'attend pas le résultat du traitement (202) :
@@ -52,7 +51,8 @@ async function call(path: string, body: unknown): Promise<void> {
 }
 
 export const n8n = {
-  importerProspects: (secteur_id: string, categories: Categorie[]) => call('importer-prospects', { secteur_id, categories }),
+  importerProspects: (secteur_id: string, activite: string, localisation: string) =>
+    call('importer-prospects', { secteur_id, activite, localisation }),
   analyserNote: (note_id: string) => call('analyser-note', { note_id }),
   preparerRdv: (rdv_id: string) => call('preparer-rdv', { rdv_id }),
   redigerEmail: (email_id: string) => call('rediger-email', { email_id }),

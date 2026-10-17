@@ -99,6 +99,7 @@ const CATEGORY_ICONS: Record<Categorie, ReturnType<typeof make>> = {
     'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
   ]),
   cafe: make(['M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z']),
+  autre: make(['M3 9l1.5-5h15L21 9M3 9h18M3 9v11h18V9M9 20v-6h6v6']),
   coiffure: make([
     'M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879a3 3 0 11-4.242-4.242L10.5 10.5m0 0l2.121 2.121',
   ]),

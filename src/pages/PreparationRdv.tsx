@@ -7,7 +7,7 @@ import { ObjectionsCard } from '../components/preparation/ObjectionsCard';
 import { PointsClesCard } from '../components/preparation/PointsClesCard';
 import { ErrorState } from '../components/StateViews';
 import { repository } from '../data/repository';
-import { CATEGORIE_LABEL, CATEGORIE_PUBLIC, RDV_STATUT_LABEL, formatRdvDate, formatRelativeDays } from '../lib/format';
+import { CATEGORIE_PUBLIC, activiteLabel, RDV_STATUT_LABEL, formatRdvDate, formatRelativeDays } from '../lib/format';
 import { useAsync } from '../lib/useAsync';
 import type { PreparationRdv as Preparation } from '../types';
 
@@ -102,7 +102,7 @@ export default function PreparationRdv() {
             </div>
             <p className="mt-2 text-sm text-slate-400">
               {p.gerant && <>Avec {p.gerant}, gérant · </>}
-              {CATEGORIE_LABEL[p.categorie]} · potentiel <span className="font-semibold text-brand">{p.score_potentiel}</span>/100
+              {activiteLabel(p)} · potentiel <span className="font-semibold text-brand">{p.score_potentiel}</span>/100
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

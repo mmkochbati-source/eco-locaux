@@ -182,3 +182,9 @@ Le référentiel Oreegami demande un output concret pour chacun des trois acteur
 - Route `/pilotage`, visible dans le menu pour `profils.role = 'admin'` seulement.
 - Données : RPC `eco_pilotage()` (security definer, refusée hors admin). Aucun chiffre calculé dans le front.
 - Contenu : 8 indicateurs (commerces, contactés, emails, RDV obtenus, RDV à venir, clients, économies potentielles, score moyen), entonnoir par statut, tableau par type de commerce, tableau par commercial.
+
+### Import par ville et activité libres (17/10)
+
+- La fenêtre « Importer » demande deux champs texte : **Localisation** (ex. Paris, Marseille) et **Activité** (ex. fleuriste). WF1 lance une recherche Google Maps « activité ville » (20 commerces maximum).
+- L'activité saisie est enregistrée dans `prospects.activite` et affichée partout à la place de la famille. La famille (`categorie`) est déduite par WF1 : une des 5 familles si l'activité y correspond, sinon `autre` (score calculé sans ratio de consommation dédié).
+- La carte se cadre automatiquement sur les commerces quand ils sont hors du secteur.

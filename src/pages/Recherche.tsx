@@ -19,6 +19,7 @@ import { SHORTCUT_LABEL } from '../components/Topbar';
 import { DATA_CHANGED_EVENT, repository } from '../data/repository';
 import {
   CATEGORIE_LABEL,
+  activiteLabel,
   CATEGORIE_PLURIEL,
   PRIORITE_LABEL,
   STATUT_LABEL,
@@ -413,7 +414,7 @@ function ProspectCard({
             </button>
           </h3>
           <p className="mt-0.5 truncate text-xs text-slate-400">
-            {CATEGORIE_LABEL[p.categorie]} · {p.adresse}
+            {activiteLabel(p)} · {p.adresse}
           </p>
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <StatutBadge statut={p.statut} />

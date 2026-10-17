@@ -17,6 +17,8 @@ const base = {
   secteur_id: 'sec-lyon-nord',
   google_place_id: null,
   site_web: null,
+  activite: null,
+  localisation: null,
   tags: [] as string[],
 };
 
@@ -276,6 +278,7 @@ const CATEGORIE_PLURIEL: Record<Categorie, string> = {
   epicerie: 'épiceries',
   coiffure: 'salons de coiffure',
   pharmacie: 'pharmacies',
+  autre: 'commerces',
 };
 
 type Contenu = Pick<PreparationRdv, 'trajet' | 'checklist' | 'points_cles' | 'objections'>;

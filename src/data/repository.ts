@@ -36,7 +36,7 @@ export interface Repository {
     patch: Partial<Pick<PreparationRdv, 'checklist' | 'points_cles' | 'objections'>>,
   ): Promise<void>; // met modifie_par_commercial à true pour points_cles / objections
   exportPreparationPdf(rdvId: string): Promise<{ pdf_url: string | null }>; // WF4
-  importProspects(categories: Categorie[]): Promise<void>; // WF1 : les prospects arrivent ensuite par Realtime
+  importProspects(input: { activite: string; localisation: string }): Promise<void>; // WF1 : les prospects arrivent ensuite par Realtime
   subscribeProspects(cb: () => void): () => void; // Realtime sur la table prospects
   subscribeNote(prospectId: string, cb: (n: Note) => void): () => void; // Realtime sur la table notes
   getDernierEmail(prospectId: string): Promise<EmailProspection | null>;

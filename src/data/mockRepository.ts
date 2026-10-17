@@ -181,6 +181,7 @@ const POSTES: Record<Prospect['categorie'], string> = {
   epicerie: 'les meubles frigorifiques ouverts et l\'éclairage',
   coiffure: "l'eau chaude des bacs et les sèche-cheveux",
   pharmacie: "l'éclairage de l'enseigne et la climatisation",
+  autre: "l'éclairage et le chauffage",
 };
 
 function demoEmail(p: Prospect): Pick<EmailProspection, 'objet' | 'message'> {
@@ -228,6 +229,8 @@ export const mockRepository: Repository = {
       gerant: null,
       email: null,
       site_web: null,
+      activite: null,
+      localisation: null,
       surface_m2: null,
       surface_production_m2: null,
       employes: null,
