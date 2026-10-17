@@ -18,9 +18,7 @@ import { EmptyState, ErrorState } from '../components/StateViews';
 import { SHORTCUT_LABEL } from '../components/Topbar';
 import { DATA_CHANGED_EVENT, repository } from '../data/repository';
 import {
-  CATEGORIE_LABEL,
   activiteLabel,
-  CATEGORIE_PLURIEL,
   PRIORITE_LABEL,
   STATUT_LABEL,
   formatDistance,
@@ -29,12 +27,11 @@ import {
 } from '../lib/format';
 import { useDistance, useProfil } from '../lib/ProfilContext';
 import { useAsync } from '../lib/useAsync';
-import type { Categorie, Priorite, Prospect, StatutProspect } from '../types';
+import type { Priorite, Prospect, StatutProspect } from '../types';
 
 type Mode = 'recherche' | 'prospects';
 type Tri = 'potentiel' | 'distance';
 
-const CATEGORIES = Object.keys(CATEGORIE_LABEL) as Categorie[];
 const STATUTS = Object.keys(STATUT_LABEL) as StatutProspect[];
 const PRIORITES = Object.keys(PRIORITE_LABEL) as Priorite[];
 
@@ -44,7 +41,8 @@ export default function Recherche({ mode }: { mode: Mode }) {
   const [params, setParams] = useSearchParams();
   const q = params.get('q') ?? '';
 
-  const [categorie, setCategorie] = useState<Categorie | undefined>();
+  // Activité saisie à l'import (ou famille pour les anciens commerces), choisie dans le menu déroulant.
+  const [activite, setActivite] = useState<string>('');
   const [statut, setStatut] = useState<StatutProspect | undefined>();
   const [priorite, setPriorite] = useState<Priorite | undefined>();
   // Ville choisie à l'import (prospects.localisation) ; SECTEUR = commerces importés sans ville (secteur du commercial).
@@ -55,16 +53,18 @@ export default function Recherche({ mode }: { mode: Mode }) {
   // « Mes prospects » affiche tous les commerces attribués au commercial, y compris ceux juste importés.
 
   const list = useAsync(
-    () => repository.listProspects({ categorie, statut, priorite, q: q || undefined }),
-    [categorie, statut, priorite, q],
+    () => repository.listProspects({ statut, priorite, q: q || undefined }),
+    [statut, priorite, q],
   );
   const totals = useAsync(async () => {
     const [all, rdvs] = await Promise.all([repository.listProspects(), repository.listRendezVous()]);
     const villes = Array.from(new Set(all.map((p) => p.localisation?.trim()).filter((v): v is string => !!v))).sort((a, b) =>
       a.localeCompare(b, 'fr'),
     );
+    const activites = Array.from(new Set(all.map((p) => activiteLabel(p)))).sort((a, b) => a.localeCompare(b, 'fr'));
     return {
       prospects: all.length,
+      activites,
       villes,
       avecSecteur: all.some((p) => !p.localisation?.trim()),
       rdvSemaine: rdvs.filter((r) => r.statut === 'planifie' && isUpcoming(r.date_heure) && isThisWeek(r.date_heure)).length,
@@ -73,6 +73,7 @@ export default function Recherche({ mode }: { mode: Mode }) {
 
   const results = useMemo(() => {
     const items = (list.data ?? []).filter((p) => {
+      if (activite && activiteLabel(p) !== activite) return false;
       if (!ville) return true;
       const loc = p.localisation?.trim() ?? '';
       return ville === SECTEUR ? loc === '' : loc.toLowerCase() === ville.toLowerCase();
@@ -81,7 +82,7 @@ export default function Recherche({ mode }: { mode: Mode }) {
       tri === 'potentiel' ? b.score_potentiel - a.score_potentiel : (distanceOf(a) ?? 1e9) - (distanceOf(b) ?? 1e9),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list.data, tri, mode, profil, ville]);
+  }, [list.data, tri, mode, profil, ville, activite]);
 
   // Nouveaux prospects (import Google Places, création) : Realtime en Supabase, événement local en démo.
   const { reload: reloadList } = list;
@@ -113,7 +114,7 @@ export default function Recherche({ mode }: { mode: Mode }) {
   }
 
   function resetFilters() {
-    setCategorie(undefined);
+    setActivite('');
     setStatut(undefined);
     setPriorite(undefined);
     setVille('');
@@ -181,15 +182,16 @@ export default function Recherche({ mode }: { mode: Mode }) {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Catégorie">
-            <CategoryPill active={!categorie} onClick={() => setCategorie(undefined)}>
-              Tous
-            </CategoryPill>
-            {CATEGORIES.map((c) => (
-              <CategoryPill key={c} active={categorie === c} onClick={() => setCategorie(c)}>
-                {CATEGORIE_PLURIEL[c]}
-              </CategoryPill>
-            ))}
+          <div className="flex flex-wrap items-center gap-2">
+            <SelectPill
+              label="Activité"
+              value={activite}
+              onChange={setActivite}
+              options={[
+                { value: '', label: 'Activité : toutes' },
+                ...(totals.data?.activites ?? []).map((a) => ({ value: a, label: a })),
+              ]}
+            />
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {profil && totals.data && (totals.data.villes.length > 0 || totals.data.avecSecteur) && (
@@ -289,23 +291,6 @@ export default function Recherche({ mode }: { mode: Mode }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function CategoryPill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={
-        active
-          ? 'rounded-full bg-brand px-3 py-1.5 font-semibold text-page transition'
-          : 'rounded-full border border-line bg-card px-3 py-1.5 text-slate-300 transition hover:border-slate-500'
-      }
-    >
-      {children}
-    </button>
   );
 }
 
