@@ -1,4 +1,4 @@
-import type { Historique, Note, PreparationRdv, Prospect, RendezVous } from '../types';
+import type { EmailProspection, Historique, Note, Pilotage, PreparationRdv, Prospect, RendezVous, StatutProspect } from '../types';
 import type { Repository } from './repository';
 import {
   DEMO_HISTORIQUE,
@@ -26,6 +26,7 @@ interface State {
   notes: Note[];
   rendezVous: RendezVous[];
   preparations: PreparationRdv[];
+  emails?: EmailProspection[];
 }
 
 function seed(): State {
@@ -160,6 +161,39 @@ function scheduleAnalyse(noteId: string) {
   }, ANALYSE_DELAY_MS);
 }
 
+// --- Email de prospection : simulation de WF4 (rédaction) et WF5 (envoi) ---
+
+const emailListeners = new Map<string, Set<(e: EmailProspection) => void>>();
+const EMAIL_DELAY_MS = 1500;
+
+function emails(): EmailProspection[] {
+  if (!state.emails) state.emails = [];
+  return state.emails;
+}
+
+function notifyEmail(e: EmailProspection) {
+  emailListeners.get(e.prospect_id)?.forEach((cb) => cb(structuredClone(e)));
+}
+
+const POSTES: Record<Prospect['categorie'], string> = {
+  boulangerie: 'les fours de cuisson et les chambres de froid',
+  cafe: 'les machines à café et les frigos de bar',
+  epicerie: 'les meubles frigorifiques ouverts et l\'éclairage',
+  coiffure: "l'eau chaude des bacs et les sèche-cheveux",
+  pharmacie: "l'éclairage de l'enseigne et la climatisation",
+};
+
+function demoEmail(p: Prospect): Pick<EmailProspection, 'objet' | 'message'> {
+  return {
+    objet: `${p.nom} : alléger la facture d'énergie`,
+    message:
+      `Bonjour,\n\nDans un commerce comme le vôtre, ${POSTES[p.categorie]} pèsent souvent lourd sur la facture d'électricité. ` +
+      `Chaque poste mal réglé grignote directement la marge.\n\nEco-Locaux propose un court diagnostic pour repérer où ${p.nom} consomme le plus ` +
+      `et les premières actions pour alléger la facture.\n\nAuriez-vous 15 minutes cette semaine ou la suivante, sur place ou par téléphone ?\n\n` +
+      `Si le sujet ne vous intéresse pas, répondez simplement « non merci » et je ne vous recontacterai pas.\n\n${DEMO_PROFIL.nom}\nEco-Locaux`,
+  };
+}
+
 export const mockRepository: Repository = {
   getProfil: () => delay(DEMO_PROFIL),
 
@@ -193,6 +227,7 @@ export const mockRepository: Repository = {
       horaires: null,
       gerant: null,
       email: null,
+      site_web: null,
       surface_m2: null,
       surface_production_m2: null,
       employes: null,
@@ -341,5 +376,137 @@ export const mockRepository: Repository = {
     return () => {
       noteListeners.get(prospectId)?.delete(cb);
     };
+  },
+
+  getDernierEmail: async (prospectId) =>
+    delay(
+      emails()
+        .filter((e) => e.prospect_id === prospectId)
+        .sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ?? null,
+    ),
+
+  preparerEmail: async (prospectId) => {
+    const p = findProspect(prospectId);
+    const email: EmailProspection = {
+      id: uid('e'),
+      prospect_id: prospectId,
+      destinataire: null,
+      objet: null,
+      message: null,
+      statut: 'generation',
+      erreur_detail: null,
+      envoye_le: null,
+      created_at: new Date().toISOString(),
+    };
+    emails().push(email);
+    persist();
+    const fail = simulate('error');
+    window.setTimeout(() => {
+      Object.assign(
+        email,
+        fail
+          ? { statut: 'erreur', erreur_detail: 'Réponse IA invalide (simulation).' }
+          : { ...demoEmail(p), destinataire: p.email, statut: 'brouillon' },
+      );
+      persist();
+      notifyEmail(email);
+    }, EMAIL_DELAY_MS);
+    return delay(email);
+  },
+
+  updateEmail: async (id, patch) => {
+    const email = emails().find((e) => e.id === id);
+    if (!email) throw new Error('Email introuvable');
+    Object.assign(email, patch);
+    persist();
+    await delay(null);
+  },
+
+  envoyerEmail: async (id) => {
+    const email = emails().find((e) => e.id === id);
+    if (!email) throw new Error('Email introuvable');
+    if (!email.destinataire || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.destinataire)) {
+      throw new Error("L'email est incomplet (adresse, objet ou message) ou déjà envoyé.");
+    }
+    email.statut = 'envoi';
+    persist();
+    notifyEmail(email);
+    window.setTimeout(() => {
+      // Démo : aucun email ne part réellement.
+      email.statut = 'envoye';
+      email.envoye_le = new Date().toISOString();
+      const p = findProspect(email.prospect_id);
+      if (p.statut === 'nouveau') p.statut = 'contacte';
+      state.historique.push({
+        id: uid('h'),
+        prospect_id: p.id,
+        type: 'email',
+        resume: `Email envoyé : ${email.objet ?? ''}`,
+        date: new Date().toISOString(),
+      });
+      persist();
+      notifyEmail(email);
+    }, EMAIL_DELAY_MS);
+    await delay(null);
+  },
+
+  subscribeEmail: (prospectId, cb) => {
+    if (!emailListeners.has(prospectId)) emailListeners.set(prospectId, new Set());
+    emailListeners.get(prospectId)!.add(cb);
+    return () => {
+      emailListeners.get(prospectId)?.delete(cb);
+    };
+  },
+
+  getPilotage: async () => {
+    const ps = state.prospects;
+    const ORDRE: StatutProspect[] = ['nouveau', 'contacte', 'rdv_planifie', 'client', 'perdu'];
+    const eco = (list: Prospect[]) => list.filter((p) => p.statut !== 'perdu').reduce((s, p) => s + (p.economies_estimees_eur ?? 0), 0);
+    const cats = Array.from(new Set(ps.map((p) => p.categorie)));
+    const envoyes = emails().filter((e) => e.statut === 'envoye').length;
+    const pilotage: Pilotage = {
+      genere_le: new Date().toISOString(),
+      totaux: {
+        prospects: ps.length,
+        contactes: ps.filter((p) => p.statut !== 'nouveau').length,
+        rdv_planifies: ps.filter((p) => p.statut === 'rdv_planifie' || p.statut === 'client').length,
+        clients: ps.filter((p) => p.statut === 'client').length,
+        perdus: ps.filter((p) => p.statut === 'perdu').length,
+        priorite_haute: ps.filter((p) => p.priorite === 'haute').length,
+        economies_potentielles_eur: eco(ps),
+        score_moyen: ps.length ? Math.round(ps.reduce((s, p) => s + p.score_potentiel, 0) / ps.length) : 0,
+      },
+      emails: { envoyes, brouillons: emails().filter((e) => e.statut === 'brouillon').length },
+      rdv: {
+        a_venir: state.rendezVous.filter((r) => r.statut === 'planifie' && r.date_heure >= new Date().toISOString()).length,
+        realises: state.rendezVous.filter((r) => r.statut === 'realise').length,
+        annules: state.rendezVous.filter((r) => r.statut === 'annule').length,
+      },
+      par_statut: ORDRE.map((statut) => ({ statut, nb: ps.filter((p) => p.statut === statut).length })).filter((x) => x.nb > 0),
+      par_categorie: cats
+        .map((categorie) => {
+          const list = ps.filter((p) => p.categorie === categorie);
+          return {
+            categorie,
+            prospects: list.length,
+            rdv: list.filter((p) => p.statut === 'rdv_planifie' || p.statut === 'client').length,
+            score_moyen: Math.round(list.reduce((s, p) => s + p.score_potentiel, 0) / list.length),
+            economies_eur: eco(list),
+          };
+        })
+        .sort((a, b) => b.economies_eur - a.economies_eur),
+      par_commercial: [
+        {
+          nom: DEMO_PROFIL.nom,
+          secteur: DEMO_PROFIL.secteur_nom,
+          prospects: ps.length,
+          contactes: ps.filter((p) => p.statut !== 'nouveau').length,
+          emails_envoyes: envoyes,
+          rdv: state.rendezVous.filter((r) => r.statut !== 'annule').length,
+          clients: ps.filter((p) => p.statut === 'client').length,
+        },
+      ],
+    };
+    return delay(pilotage);
   },
 };

@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import Connexion from './pages/Connexion';
 import FicheProspect from './pages/FicheProspect';
+import Pilotage from './pages/Pilotage';
 import PreparationRdv from './pages/PreparationRdv';
 import Recherche from './pages/Recherche';
 import RendezVous from './pages/RendezVous';
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="prospects/:id" element={<FicheProspect />} />
           <Route path="rendez-vous" element={<RendezVous />} />
           <Route path="rendez-vous/:id" element={<PreparationRdv />} />
+          <Route path="pilotage" element={<Pilotage />} />
           <Route path="*" element={<Navigate to="/recherche" replace />} />
         </Route>
       </Routes>

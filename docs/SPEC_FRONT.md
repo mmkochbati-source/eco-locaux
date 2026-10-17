@@ -12,8 +12,9 @@ Source : maquettes Stitch (`design/`) et document « Étape 2 : Intégration de 
 | `/prospects/:id` | Fiche prospect | `eco_locaux_fiche_prospect_…` |
 | `/rendez-vous` | Liste des rendez-vous | non maquetté |
 | `/rendez-vous/:id` | Préparation du RDV | `pr_paration_du_rendez_vous_…` |
+| `/pilotage` | Pilotage (direction, rôle admin) | non maquetté, ajouté le 17/10 |
 
-Menu latéral : Recherche, Mes prospects (badge = nombre de prospects), Rendez-vous (badge = nombre de RDV à venir). **Pas de « Statistiques ».** Carte profil en bas : initiales, nom, secteur.
+Menu latéral : Recherche, Mes prospects (badge = nombre de prospects), Rendez-vous (badge = nombre de RDV à venir), et **Pilotage** pour le rôle admin uniquement. Carte profil en bas : initiales, nom, secteur.
 
 ## Types (`src/types.ts`)
 
@@ -162,3 +163,22 @@ Aucune authentification dans cette étape : le mock expose un commercial fixe (C
 - **Champs non typés des maquettes** (catégorie détaillée, « A demandé un devis », date d'estimation, durée d'appel, communes) : non affichés, aucune colonne ajoutée.
 - **Planifier un RDV** ne modifie ni le statut du prospect ni l'historique.
 - Distance calculée depuis le centre du secteur (pas de géolocalisation navigateur).
+
+
+## Ajouts du 17/10/2026 (écarts justifiés au périmètre initial)
+
+Le référentiel Oreegami demande un output concret pour chacun des trois acteurs. Deux briques ont donc été ajoutées après le MVP.
+
+### Email de prise de rendez-vous (output du commerçant)
+
+- Carte « Email de prise de rendez-vous » en bas de la fiche prospect (pleine largeur).
+- « Préparer l'email » crée une ligne `emails_prospection` puis déclenche WF4 (`/eco-locaux/rediger-email`) : l'IA rédige objet et message, sans chiffre.
+- Le commercial relit et modifie destinataire, objet et message, puis clique sur « Envoyer » : WF5 (`/eco-locaux/envoyer-email`) envoie par Gmail, trace l'envoi dans l'historique et passe le prospect à « contacté ».
+- L'adresse vient du site web du commerce (WF1). Si aucune adresse n'est trouvée, le commercial peut la saisir.
+- États : aucune, rédaction en cours, brouillon, envoi en cours, envoyé, erreur (avec message et possibilité de renvoyer).
+
+### Pilotage (output du patron)
+
+- Route `/pilotage`, visible dans le menu pour `profils.role = 'admin'` seulement.
+- Données : RPC `eco_pilotage()` (security definer, refusée hors admin). Aucun chiffre calculé dans le front.
+- Contenu : 8 indicateurs (commerces, contactés, emails, RDV obtenus, RDV à venir, clients, économies potentielles, score moyen), entonnoir par statut, tableau par type de commerce, tableau par commercial.

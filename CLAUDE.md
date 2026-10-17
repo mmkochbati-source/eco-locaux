@@ -8,11 +8,11 @@ Lis `docs/SPEC_FRONT.md` avant de coder : il décrit chaque écran, les types de
 
 ## Périmètre du MVP
 
-Trois écrans maquettés : Recherche de prospects, Fiche prospect, Préparation du RDV. S'y ajoutent les éléments non maquettés listés dans `docs/SPEC_FRONT.md` (section « Éléments non maquettés »), et rien d'autre.
+Trois écrans maquettés : Recherche de prospects, Fiche prospect, Préparation du RDV. S'y ajoutent l'email de prise de rendez-vous et l'écran Pilotage (ajouts du 17/10, voir la fin de `docs/SPEC_FRONT.md`), ainsi que les éléments non maquettés listés dans `docs/SPEC_FRONT.md` (section « Éléments non maquettés »), et rien d'autre.
 
 Hors périmètre, à ne pas construire :
 - le bouton « Démarrer le RDV » (retiré volontairement) ;
-- l'écran « Statistiques » (reporté après le MVP : ne pas l'afficher dans le menu) ;
+- un écran « Statistiques » pour les commerciaux (l'écran Pilotage, réservé à la direction, est le seul tableau de bord : voir la fin de `docs/SPEC_FRONT.md`) ;
 - tout bouton, page, widget ou filtre absent des maquettes et de la spec.
 
 Pourquoi : les maquettes générées par IA contiennent souvent des éléments en trop, et chaque élément construit est un élément à maintenir. Si une fonctionnalité te semble manquer ou superflue, pose la question avant de la construire.

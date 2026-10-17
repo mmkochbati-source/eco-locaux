@@ -1,5 +1,7 @@
 import type {
   Categorie,
+  EmailProspection,
+  Pilotage,
   Historique,
   Note,
   PreparationRdv,
@@ -37,6 +39,12 @@ export interface Repository {
   importProspects(categories: Categorie[]): Promise<void>; // WF1 : les prospects arrivent ensuite par Realtime
   subscribeProspects(cb: () => void): () => void; // Realtime sur la table prospects
   subscribeNote(prospectId: string, cb: (n: Note) => void): () => void; // Realtime sur la table notes
+  getDernierEmail(prospectId: string): Promise<EmailProspection | null>;
+  preparerEmail(prospectId: string): Promise<EmailProspection>; // WF4 : brouillon IA
+  updateEmail(id: string, patch: Partial<Pick<EmailProspection, 'destinataire' | 'objet' | 'message'>>): Promise<void>;
+  envoyerEmail(id: string): Promise<void>; // WF5 : envoi Gmail après relecture
+  subscribeEmail(prospectId: string, cb: (e: EmailProspection) => void): () => void; // Realtime
+  getPilotage(): Promise<Pilotage>; // réservé aux admins (direction)
 }
 
 // Événement émis après chaque écriture, pour que la sidebar (badges) se mette à jour.
@@ -51,6 +59,8 @@ const WRITE_METHODS = new Set<keyof Repository>([
   'regeneratePreparation',
   'updatePreparation',
   'importProspects',
+  'preparerEmail',
+  'envoyerEmail',
 ]);
 
 function withChangeEvents(repo: Repository): Repository {

@@ -4,6 +4,7 @@ import type { Categorie, Historique, Note, PreparationRdv, Profil, Prospect, Ren
 
 export const DEMO_PROFIL: Profil = {
   nom: 'Camille Moreau',
+  role: 'admin', // en démo, Camille voit aussi l'écran Pilotage de la direction
   secteur_id: 'sec-lyon-nord',
   initiales: 'CM',
   secteur_nom: 'Lyon Nord',
@@ -15,6 +16,7 @@ const base = {
   commercial_id: 'com-camille',
   secteur_id: 'sec-lyon-nord',
   google_place_id: null,
+  site_web: null,
   tags: [] as string[],
 };
 

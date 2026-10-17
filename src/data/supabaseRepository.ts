@@ -1,5 +1,5 @@
 import type { PostgrestError } from '@supabase/supabase-js';
-import type { Note, PreparationRdv, Prospect, RendezVous, RendezVousAvecProspect } from '../types';
+import type { EmailProspection, Note, Pilotage, PreparationRdv, Prospect, RendezVous, RendezVousAvecProspect } from '../types';
 import { N8nError, n8n } from './n8n';
 import type { Repository } from './repository';
 import { getSupabase } from './supabaseClient';
@@ -49,6 +49,17 @@ function withLocalFailure(prep: PreparationRdv): PreparationRdv {
   return prep;
 }
 
+const EMAIL_COLUMNS = 'id, prospect_id, destinataire, objet, message, statut, erreur_detail, envoye_le, created_at';
+
+// Même logique que les préparations : si le webhook est injoignable, la ligne resterait « generation » ou « envoi ».
+const failedEmails = new Map<string, string>();
+function withEmailFailure(e: EmailProspection): EmailProspection {
+  const detail = failedEmails.get(e.id);
+  if (detail && (e.statut === 'generation' || e.statut === 'envoi')) return { ...e, statut: 'erreur', erreur_detail: detail };
+  if (e.statut !== 'generation' && e.statut !== 'envoi') failedEmails.delete(e.id);
+  return e;
+}
+
 const PREP_COLUMNS =
   'id, rdv_id, statut, trajet, checklist, points_cles, objections, genere_le, modifie_par_commercial, erreur_detail';
 
@@ -58,18 +69,20 @@ export const supabaseRepository: Repository = {
     const profil = check(
       await db()
         .from('profils')
-        .select('nom, secteur_id, secteur:secteurs(nom, centre_lat, centre_lng, rayon_km)')
+        .select('nom, role, secteur_id, secteur:secteurs(nom, centre_lat, centre_lng, rayon_km)')
         .eq('id', id)
         .single(),
       'Profil',
     ) as unknown as {
       nom: string;
+      role: 'commercial' | 'admin';
       secteur_id: string | null;
       secteur: { nom: string; centre_lat: number; centre_lng: number; rayon_km: number } | null;
     };
     if (!profil.secteur) throw new Error("Votre compte n'est rattaché à aucun secteur. Contactez un administrateur.");
     return {
       nom: profil.nom,
+      role: profil.role,
       initiales: initiales(profil.nom),
       secteur_id: profil.secteur_id,
       secteur_nom: profil.secteur.nom,
@@ -252,5 +265,66 @@ export const supabaseRepository: Repository = {
     return () => {
       void db().removeChannel(channel);
     };
+  },
+
+  async getDernierEmail(prospectId) {
+    const res = await db()
+      .from('emails_prospection')
+      .select(EMAIL_COLUMNS)
+      .eq('prospect_id', prospectId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (res.error) throw new Error(`Email : ${res.error.message}`);
+    return res.data ? withEmailFailure(res.data as EmailProspection) : null;
+  },
+
+  async preparerEmail(prospectId) {
+    // Droits en base : le front ne crée que la ligne (statut « generation ») ; WF4 écrit le brouillon.
+    const email = check(
+      await db().from('emails_prospection').insert({ prospect_id: prospectId }).select(EMAIL_COLUMNS).single(),
+      "Création de l'email",
+    ) as EmailProspection;
+    try {
+      await n8n.redigerEmail(email.id);
+    } catch (err) {
+      failedEmails.set(email.id, err instanceof Error ? err.message : String(err));
+      throw err;
+    }
+    return email;
+  },
+
+  async updateEmail(id, patch) {
+    check(await db().from('emails_prospection').update(patch).eq('id', id).select('id').single(), "Mise à jour de l'email");
+  },
+
+  async envoyerEmail(id) {
+    failedEmails.delete(id);
+    await n8n.envoyerEmail(id);
+  },
+
+  subscribeEmail(prospectId, cb) {
+    const channel = db()
+      .channel(`emails-${prospectId}-${Math.random().toString(36).slice(2)}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'emails_prospection', filter: `prospect_id=eq.${prospectId}` },
+        (payload) => {
+          if (payload.new && 'id' in payload.new) cb(withEmailFailure(payload.new as EmailProspection));
+        },
+      )
+      .subscribe();
+    return () => {
+      void db().removeChannel(channel);
+    };
+  },
+
+  async getPilotage() {
+    const res = await db().rpc('eco_pilotage');
+    if (res.error) {
+      if (res.error.code === '42501') throw new Error('Écran réservé à la direction.');
+      throw new Error(`Pilotage : ${res.error.message}`);
+    }
+    return res.data as Pilotage;
   },
 };

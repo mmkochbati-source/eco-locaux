@@ -42,6 +42,9 @@ async function call(path: string, body: unknown): Promise<void> {
   if (res.status === 401 || res.status === 403) {
     throw new N8nError("Accès refusé : vous n'avez pas accès à cette ressource.", res.status);
   }
+  if (res.status === 422) {
+    throw new N8nError("L'email est incomplet (adresse, objet ou message) ou déjà envoyé.", 422);
+  }
   if (res.status === 404) {
     throw new N8nError("Le traitement n'est pas disponible (webhook n8n inactif).", 404);
   }
@@ -52,4 +55,6 @@ export const n8n = {
   importerProspects: (secteur_id: string, categories: Categorie[]) => call('importer-prospects', { secteur_id, categories }),
   analyserNote: (note_id: string) => call('analyser-note', { note_id }),
   preparerRdv: (rdv_id: string) => call('preparer-rdv', { rdv_id }),
+  redigerEmail: (email_id: string) => call('rediger-email', { email_id }),
+  envoyerEmail: (email_id: string) => call('envoyer-email', { email_id }),
 };

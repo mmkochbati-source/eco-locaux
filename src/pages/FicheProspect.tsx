@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { PrioriteHauteBadge, StatutBadge } from '../components/Badge';
+import { EmailCard } from '../components/fiche/EmailCard';
 import { HistoriqueCard } from '../components/fiche/HistoriqueCard';
 import { InfosClesCard } from '../components/fiche/InfosClesCard';
 import { NotesCard } from '../components/fiche/NotesCard';
@@ -28,6 +29,15 @@ export default function FicheProspect() {
   const [planning, setPlanning] = useState(false);
   const { setData } = prospect;
   const onTagsChanged = useCallback((tags: string[]) => setData((prev) => ({ ...prev!, tags })), [setData]);
+  // Après l'envoi d'un email : le statut passe à « contacté » et l'historique gagne une ligne.
+  const [historiqueVersion, setHistoriqueVersion] = useState(0);
+  const onEmailSent = useCallback(() => {
+    setHistoriqueVersion((v) => v + 1);
+    repository
+      .getProspect(id)
+      .then((p) => setData(p))
+      .catch(() => {});
+  }, [id, setData]);
 
   // Realtime : tags ajoutés par l'IA, chiffres recalculés en base après une modification.
   useEffect(
@@ -127,9 +137,10 @@ export default function FicheProspect() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <InfosClesCard prospect={p} onSaved={(updated) => prospect.setData(updated)} />
-        <HistoriqueCard prospectId={p.id} />
+        <HistoriqueCard key={historiqueVersion} prospectId={p.id} />
         <PotentielCard prospect={p} />
         <NotesCard prospect={p} onTagsChanged={onTagsChanged} />
+        <EmailCard prospect={p} onSent={onEmailSent} />
       </div>
 
       {planning && <PlanifierRdvModal prospectId={p.id} prospectNom={p.nom} onClose={() => setPlanning(false)} />}

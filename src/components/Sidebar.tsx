@@ -4,7 +4,7 @@ import { DATA_CHANGED_EVENT, repository } from '../data/repository';
 import { isUpcoming } from '../lib/format';
 import { useProfil } from '../lib/ProfilContext';
 import { useAsync } from '../lib/useAsync';
-import { BuildingIcon, CalendarIcon, GlobeIcon, LogoutIcon, SearchIcon } from './icons';
+import { BuildingIcon, CalendarIcon, ChartIcon, GlobeIcon, LogoutIcon, SearchIcon } from './icons';
 import { useAuth } from '../lib/AuthContext';
 
 export function Sidebar() {
@@ -46,6 +46,10 @@ export function Sidebar() {
       active: pathname.startsWith('/rendez-vous'),
       badge: counts.data && counts.data.rdvAVenir > 0 ? { value: counts.data.rdvAVenir, accent: true } : null,
     },
+    // Écran de la direction, visible seulement pour le rôle admin.
+    ...(profil?.role === 'admin'
+      ? [{ to: '/pilotage', label: 'Pilotage', Icon: ChartIcon, active: pathname.startsWith('/pilotage'), badge: null }]
+      : []),
   ];
 
   return (
